@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASP.NET Core Web API — Complete Notes &amp; Revision Sheet</title>
+<style>
+/* ================= RESET ================= */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080a14;
+  --card:rgba(255,255,255,.042);
+  --card-hi:rgba(255,255,255,.075);
+  --border:rgba(255,255,255,.09);
+  --border-hi:rgba(255,255,255,.19);
+  --txt:#e9eaf5;
+  --muted:#9698b8;
+  --purple:#512BD4;
+  --purple-l:#a78bfa;
+  --purple-xl:#c4b5fd;
+  --sky:#38bdf8;
+  --cyan:#22d3ee;
+  --green:#34d399;
+  --amber:#fbbf24;
+  --red:#f87171;
+  --pink:#f472b6;
+  --radius:16px;
+  --mono:ui-monospace,'Cascadia Code','SF Mono',Menlo,Consolas,monospace;
+  --sans:'Segoe UI',system-ui,-apple-system,'Inter',Roboto,Helvetica,Arial,sans-serif;
+}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--txt);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(900px 620px at 10% -6%, rgba(81,43,212,.40), transparent 60%),
+    radial-gradient(820px 520px at 94% 6%, rgba(56,189,248,.16), transparent 55%),
+    radial-gradient(900px 700px at 50% 110%, rgba(34,211,238,.12), transparent 60%),
+    linear-gradient(180deg,#080a14 0%,#0a0c19 50%,#080a14 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.32;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 92% 72% at 50% 28%,#000 20%,transparent 86%);
+  -webkit-mask-image:radial-gradient(ellipse 92% 72% at 50% 28%,#000 20%,transparent 86%);
+}
+
+/* ================= SCROLL PROGRESS ================= */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0%;z-index:100;
+  background:linear-gradient(90deg,#512BD4,#a78bfa,#38bdf8,#22d3ee);
+  box-shadow:0 0 14px rgba(167,139,250,.85);
+  transition:width .08s linear;
+}
+
+/* ================= NAV ================= */
+nav{
+  position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(8,10,20,.75);
+  border-bottom:1px solid var(--border);
+}
+.nav-in{
+  max-width:1200px;margin:0 auto;padding:13px 24px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.4px;font-size:1rem;white-space:nowrap}
+.brand .dot{
+  width:30px;height:30px;border-radius:9px;flex:0 0 auto;
+  background:linear-gradient(135deg,#512BD4,#38bdf8);
+  box-shadow:0 0 22px rgba(81,43,212,.6);
+  display:grid;place-items:center;font-size:.6rem;font-weight:900;color:#fff;
+  font-family:var(--mono);
+}
+.nav-links{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:600;
+  padding:7px 11px;border-radius:9px;transition:.2s;white-space:nowrap;
+}
+.nav-links a:hover{color:#fff;background:var(--card-hi)}
+
+/* ================= LAYOUT ================= */
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+section{padding:74px 0;position:relative}
+.sec-head{margin-bottom:40px;max-width:820px}
+.kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.7rem;font-weight:800;letter-spacing:2.2px;text-transform:uppercase;
+  color:var(--purple-xl);margin-bottom:13px;
+  padding:6px 13px;border-radius:999px;
+  border:1px solid rgba(167,139,250,.32);
+  background:rgba(81,43,212,.16);
+}
+.kicker.cy{color:#67e8f9;border-color:rgba(34,211,238,.32);background:rgba(34,211,238,.11)}
+.kicker.gr{color:#6ee7b7;border-color:rgba(52,211,153,.32);background:rgba(52,211,153,.11)}
+.kicker.am{color:#fcd34d;border-color:rgba(251,191,36,.32);background:rgba(251,191,36,.11)}
+h2{font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:800;letter-spacing:-1.1px;line-height:1.15}
+h2 .grad{
+  background:linear-gradient(100deg,#a78bfa 0%,#38bdf8 55%,#22d3ee 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sec-head p{color:var(--muted);margin-top:13px;font-size:1rem;max-width:700px}
+
+/* ================= HERO ================= */
+header.hero{padding:80px 0 58px;text-align:center}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:8px 17px;border-radius:999px;font-size:.78rem;font-weight:700;
+  border:1px solid rgba(52,211,153,.35);
+  background:rgba(52,211,153,.11);color:#6ee7b7;margin-bottom:24px;
+}
+.pulse{
+  width:8px;height:8px;border-radius:50%;background:#34d399;
+  box-shadow:0 0 0 0 rgba(52,211,153,.7);
+  animation:pulse 2.2s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(52,211,153,.7)}
+  70%{box-shadow:0 0 0 11px rgba(52,211,153,0)}
+  100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}
+}
+h1{font-size:clamp(2.2rem,6.2vw,4.1rem);font-weight:900;letter-spacing:-2.3px;line-height:1.05}
+h1 .grad{
+  background:linear-gradient(105deg,#c4b5fd 0%,#a78bfa 28%,#38bdf8 66%,#22d3ee 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-sub{color:var(--muted);font-size:clamp(1rem,1.9vw,1.14rem);max-width:700px;margin:20px auto 0}
+.hero-sub strong{color:var(--purple-xl);font-weight:700}
+.hero-stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:40px}
+.stat{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:15px 22px;min-width:140px;transition:.25s;backdrop-filter:blur(8px);
+}
+.stat:hover{border-color:var(--border-hi);transform:translateY(-3px);background:var(--card-hi)}
+.stat .n{
+  font-size:1.4rem;font-weight:900;letter-spacing:-1px;font-family:var(--mono);
+  background:linear-gradient(120deg,#a78bfa,#38bdf8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.stat .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;font-weight:700;margin-top:3px}
+
+/* ================= CARD ================= */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;
+  backdrop-filter:blur(8px);transition:.28s cubic-bezier(.4,0,.2,1);
+}
+.card:hover{border-color:var(--border-hi);background:var(--card-hi)}
+.card h3{font-size:1.12rem;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.card .sub{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;font-weight:800;color:var(--muted);display:block;margin-bottom:14px}
+
+/* number badge */
+.num{
+  display:inline-grid;place-items:center;
+  width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+  font-family:var(--mono);font-size:.82rem;font-weight:900;
+  background:linear-gradient(135deg,rgba(81,43,212,.75),rgba(56,189,248,.45));
+  border:1px solid rgba(167,139,250,.4);color:#ede9fe;
+  box-shadow:0 0 20px -6px rgba(81,43,212,.9);
+}
+.note-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+
+/* ================= GRID ================= */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+
+/* ================= TABLE ================= */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:520px}
+thead th{
+  text-align:left;padding:14px 18px;font-size:.7rem;font-weight:800;
+  letter-spacing:1.4px;text-transform:uppercase;color:var(--purple-xl);
+  background:rgba(81,43,212,.16);border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.055);color:#cfd0e6;vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:.18s}
+tbody tr:hover{background:rgba(255,255,255,.035)}
+td strong{color:#fff}
+.mono{font-family:var(--mono);font-size:.85em;color:#a5f3fc}
+
+/* method pills */
+.m{
+  font-family:var(--mono);font-size:.72rem;font-weight:900;letter-spacing:.6px;
+  padding:3px 9px;border-radius:7px;border:1px solid transparent;display:inline-block;
+}
+.m.get{background:rgba(56,189,248,.16);color:#7dd3fc;border-color:rgba(56,189,248,.34)}
+.m.post{background:rgba(52,211,153,.16);color:#6ee7b7;border-color:rgba(52,211,153,.34)}
+.m.put{background:rgba(251,191,36,.16);color:#fcd34d;border-color:rgba(251,191,36,.34)}
+.m.patch{background:rgba(244,114,182,.16);color:#f9a8d4;border-color:rgba(244,114,182,.34)}
+.m.del{background:rgba(248,113,113,.16);color:#fca5a5;border-color:rgba(248,113,113,.34)}
+
+/* status code pills */
+.sc{
+  font-family:var(--mono);font-size:.78rem;font-weight:900;
+  padding:4px 11px;border-radius:8px;display:inline-block;min-width:52px;text-align:center;
+}
+.sc.ok{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.34)}
+.sc.info{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.34)}
+.sc.warn{background:rgba(251,191,36,.15);color:#fcd34d;border:1px solid rgba(251,191,36,.34)}
+.sc.err{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.34)}
+
+/* ================= FLOW DIAGRAM ================= */
+.flow{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  padding:26px 18px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--border);
+}
+.fnode{
+  width:100%;max-width:440px;text-align:center;
+  padding:12px 18px;border-radius:12px;font-weight:700;font-size:.9rem;
+  background:rgba(255,255,255,.055);border:1px solid var(--border);
+  transition:.25s;
+}
+.fnode:hover{transform:scale(1.03);border-color:rgba(167,139,250,.5);background:var(--card-hi)}
+.fnode.p{background:linear-gradient(135deg,rgba(81,43,212,.5),rgba(81,43,212,.2));border-color:rgba(167,139,250,.5);color:#ede9fe}
+.fnode.c{background:linear-gradient(135deg,rgba(56,189,248,.35),rgba(56,189,248,.12));border-color:rgba(56,189,248,.5);color:#bae6fd}
+.fnode.g{background:linear-gradient(135deg,rgba(52,211,153,.3),rgba(52,211,153,.1));border-color:rgba(52,211,153,.45);color:#a7f3d0}
+.fnode.a{background:linear-gradient(135deg,rgba(251,191,36,.3),rgba(251,191,36,.1));border-color:rgba(251,191,36,.45);color:#fde68a}
+.farrow{
+  color:rgba(167,139,250,.6);font-size:1.1rem;font-weight:900;line-height:1;
+  padding:7px 0;
+}
+.farrow.sm{font-size:.9rem}
+
+/* ================= CHIPS ================= */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips span{
+  font-family:var(--mono);font-size:.74rem;font-weight:700;
+  padding:5px 11px;border-radius:8px;
+  background:rgba(255,255,255,.055);border:1px solid var(--border);color:#cfcbe4;
+  transition:.2s;
+}
+.chips span:hover{background:rgba(255,255,255,.1);border-color:var(--border-hi)}
+.chips span.hi{background:linear-gradient(135deg,rgba(81,43,212,.6),rgba(56,189,248,.35));border-color:rgba(167,139,250,.5);color:#ede9fe}
+.chips span.gold{background:linear-gradient(135deg,rgba(251,191,36,.28),rgba(251,191,36,.1));border-color:rgba(251,191,36,.5);color:#fde68a}
+.chips span.gr{background:linear-gradient(135deg,rgba(52,211,153,.28),rgba(52,211,153,.1));border-color:rgba(52,211,153,.5);color:#a7f3d0}
+
+/* ================= GLOSSARY ================= */
+.search-wrap{position:relative;max-width:480px;margin-bottom:26px}
+.search-wrap input{
+  width:100%;padding:14px 18px 14px 46px;
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  color:var(--txt);font-family:var(--sans);font-size:.94rem;outline:none;
+  transition:.25s;
+}
+.search-wrap input::placeholder{color:#6f7192}
+.search-wrap input:focus{border-color:rgba(167,139,250,.6);background:var(--card-hi);box-shadow:0 0 0 4px rgba(81,43,212,.18)}
+.search-wrap .si{
+  position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:1rem;pointer-events:none;
+}
+.gcard{
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:16px 18px;transition:.25s;
+}
+.gcard:hover{border-color:rgba(167,139,250,.45);background:var(--card-hi);transform:translateY(-3px)}
+.gcard .term{
+  font-family:var(--mono);font-size:.98rem;font-weight:900;color:#c4b5fd;
+  letter-spacing:-.3px;margin-bottom:3px;
+}
+.gcard .full{font-size:.78rem;color:#7dd3fc;font-weight:600;margin-bottom:7px}
+.gcard .mean{font-size:.85rem;color:var(--muted);line-height:1.55}
+.gcard.hide{display:none}
+.no-res{
+  display:none;text-align:center;padding:40px 20px;color:var(--muted);
+  font-size:.95rem;
+}
+.no-res.show{display:block}
+
+/* ================= CODE BLOCK ================= */
+.code{
+  position:relative;border-radius:13px;overflow:hidden;
+  border:1px solid var(--border);background:#06070f;
+}
+.code-head{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 15px;background:rgba(255,255,255,.035);
+  border-bottom:1px solid var(--border);
+}
+.code-head .d{width:10px;height:10px;border-radius:50%}
+.d.r{background:#f87171}.d.y{background:#fbbf24}.d.g{background:#34d399}
+.code-head .fn{margin-left:8px;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.copy{
+  margin-left:auto;font-family:var(--sans);font-size:.7rem;font-weight:800;
+  letter-spacing:.8px;text-transform:uppercase;cursor:pointer;
+  padding:5px 11px;border-radius:7px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);
+  transition:.2s;
+}
+.copy:hover{background:rgba(167,139,250,.2);color:#fff;border-color:rgba(167,139,250,.5)}
+.copy.done{background:rgba(52,211,153,.22);color:#6ee7b7;border-color:rgba(52,211,153,.5)}
+pre{
+  padding:16px 18px;overflow-x:auto;
+  font-family:var(--mono);font-size:.84rem;line-height:1.7;color:#d7d9ee;
+}
+pre .kw{color:#c4b5fd}
+pre .st{color:#86efac}
+pre .cm{color:#5b5e7d;font-style:italic}
+
+/* ================= ONE-LINER CARDS ================= */
+.oneliner{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:16px 18px;transition:.26s;
+}
+.oneliner:hover{border-color:rgba(56,189,248,.45);background:var(--card-hi);transform:translateY(-3px)}
+.oneliner .k{
+  font-family:var(--mono);font-size:.82rem;font-weight:900;color:#67e8f9;
+  flex:0 0 auto;min-width:112px;
+}
+.oneliner .v{font-size:.87rem;color:var(--muted)}
+
+/* ================= CALLOUT ================= */
+.callout{
+  display:flex;gap:15px;align-items:flex-start;
+  border-radius:14px;padding:20px 24px;margin-top:26px;
+}
+.callout.amber{
+  background:linear-gradient(135deg,rgba(251,191,36,.11),rgba(251,191,36,.03));
+  border:1px solid rgba(251,191,36,.3);border-left:3px solid var(--amber);
+}
+.callout.purple{
+  background:linear-gradient(135deg,rgba(81,43,212,.2),rgba(81,43,212,.05));
+  border:1px solid rgba(167,139,250,.3);border-left:3px solid var(--purple-l);
+}
+.callout.green{
+  background:linear-gradient(135deg,rgba(52,211,153,.11),rgba(52,211,153,.03));
+  border:1px solid rgba(52,211,153,.3);border-left:3px solid var(--green);
+}
+.callout .ico{font-size:1.3rem;line-height:1;flex:0 0 auto}
+.callout p{font-size:.92rem;color:#dcdce9}
+.callout strong{color:#fcd34d}
+.callout.purple strong{color:var(--purple-xl)}
+.callout.green strong{color:#6ee7b7}
+
+/* ================= AUTH SPLIT ================= */
+.split{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.split .side{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:22px;text-align:center;transition:.28s;
+}
+.split .side:hover{transform:translateY(-4px);background:var(--card-hi)}
+.split .side.auth-n{border-color:rgba(56,189,248,.4)}
+.split .side.auth-z{border-color:rgba(52,211,153,.4)}
+.split .side .big{font-size:1.6rem;margin-bottom:8px}
+.split .side h4{font-size:1rem;font-weight:800;margin-bottom:5px}
+.split .side p{font-size:.84rem;color:var(--muted)}
+.vs{
+  font-family:var(--mono);font-weight:900;font-size:.8rem;color:var(--muted);
+  padding:8px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--card);
+}
+
+/* ================= REVEAL ================= */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ================= FOOTER ================= */
+footer{
+  border-top:1px solid var(--border);padding:40px 0 54px;text-align:center;
+  color:var(--muted);font-size:.84rem;
+}
+footer .fg{
+  font-weight:800;color:var(--purple-xl);letter-spacing:-.2px;
+  display:block;margin-bottom:7px;font-size:.98rem;
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:820px){
+  .nav-links{display:none}
+  section{padding:54px 0}
+  .wrap{padding:0 18px}
+  .split{grid-template-columns:1fr}
+  .vs{justify-self:center}
+  .oneliner{flex-direction:column;gap:6px}
+  .oneliner .k{min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="nav-in">
+    <div class="brand"><span class="dot">API</span> ASP.NET Core Web API</div>
+    <div class="nav-links">
+      <a href="#notes">Notes</a>
+      <a href="#rest">REST</a>
+      <a href="#security">Security</a>
+      <a href="#runtime">Runtime</a>
+      <a href="#middleware">Middleware</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#efcore">EF Core</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#revision">Revision</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="pulse"></span> Short &amp; Crisp Notes + One-Page Revision Sheet</div>
+
+    <h1>ASP.NET Core<br><span class="grad">Web API Mastery</span></h1>
+
+    <p class="hero-sub">
+      From designing RESTful endpoints to securing them with JWT, running on Kestrel behind middleware,
+      and reverse-engineering a database with EF Core — everything in <strong>one page</strong>.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat"><div class="n">8</div><div class="l">Core Topics</div></div>
+      <div class="stat"><div class="n">25+</div><div class="l">Terms &amp; Abbrevs</div></div>
+      <div class="stat"><div class="n">10</div><div class="l">Status Codes</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Full Architecture</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NOTES OVERVIEW ================= -->
+<section id="notes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● Topic Map</span>
+      <h2>The <span class="grad">Eight Pillars</span> of Web API</h2>
+      <p>Every topic you need — from design principles to the embedded HTTP server and the middleware pipeline.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card reveal">
+        <div class="note-head"><span class="num">01</span><h3>Designing Web API</h3></div>
+        <span class="sub">Plan how clients communicate</span>
+        <div class="chips">
+          <span>REST</span><span>HTTP methods</span><span>Routes</span><span>Status codes</span>
+          <span>DTOs</span><span>Validation</span><span>Error handling</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">02</span><h3>Building Web API with ASP.NET Core</h3></div>
+        <span class="sub">Create HTTP-based APIs</span>
+        <div class="chips">
+          <span>Controller / Minimal API</span><span>Routing</span><span>DI</span>
+          <span>Services</span><span>EF Core</span><span>Configuration</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">03</span><h3>RESTful Interface</h3></div>
+        <span class="sub">Follow REST principles for clean APIs</span>
+        <div class="chips">
+          <span>Resources</span><span>Statelessness</span><span>Proper HTTP verbs</span>
+          <span>Meaningful URLs</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">04</span><h3>Securing Web API</h3></div>
+        <span class="sub">Protect from unauthorized access</span>
+        <div class="chips">
+          <span>Authentication</span><span>Authorization</span><span>JWT</span>
+          <span>HTTPS</span><span>CORS</span><span>Validation</span><span>Rate limiting</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">05</span><h3>ASP.NET Core Runtime Environment</h3></div>
+        <span class="sub">Where the application runs</span>
+        <div class="chips">
+          <span>.NET Runtime</span><span>Configuration</span><span>DI</span>
+          <span>Logging</span><span>Middleware</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">06</span><h3>ASP.NET Core Host</h3></div>
+        <span class="sub">Manages startup &amp; lifetime</span>
+        <div class="chips">
+          <span>Program.cs</span><span>Configuration</span><span>Logging</span>
+          <span>DI</span><span>Web server</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">07</span><h3>Embedded HTTP Server</h3></div>
+        <span class="sub">Receives HTTP requests</span>
+        <div class="chips">
+          <span class="hi">Kestrel</span><span>Cross-platform</span><span>HTTP/HTTPS</span>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="note-head"><span class="num">08</span><h3>ASP.NET Core Middleware</h3></div>
+        <span class="sub">Processes requests &amp; responses</span>
+        <div class="chips">
+          <span>Authentication</span><span>Authorization</span><span>Exception handling</span>
+          <span>Logging</span><span>CORS</span><span>Routing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DESIGN FLOW ================= -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker cy">● Design</span>
+      <h2>A Typical <span class="grad">API Design</span></h2>
+      <p>Client sends an HTTP request, the API talks to a service, the service talks to the database — and the response travels back.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="flow reveal">
+        <div class="fnode c">Client</div>
+        <div class="farrow">↓ &nbsp;HTTP Request</div>
+        <div class="fnode p">API</div>
+        <div class="farrow">↓</div>
+        <div class="fnode p">Service</div>
+        <div class="farrow">↓</div>
+        <div class="fnode g">Database</div>
+        <div class="farrow" style="opacity:.35">┄┄┄┄┄┄┄┄┄┄</div>
+        <div class="fnode g">Database</div>
+        <div class="farrow">↑</div>
+        <div class="fnode p">Service</div>
+        <div class="farrow">↑</div>
+        <div class="fnode p">API</div>
+        <div class="farrow">↑ &nbsp;HTTP Response</div>
+        <div class="fnode c">Client</div>
+      </div>
+
+      <div class="reveal">
+        <div class="card" style="margin-bottom:16px">
+          <span class="sub">Important Design Points</span>
+          <div class="chips" style="flex-direction:column;align-items:flex-start;gap:9px">
+            <span style="width:100%"><strong style="color:#c4b5fd">URL / Route</strong> &nbsp;→&nbsp; <span class="mono">/api/products/10</span></span>
+            <span style="width:100%"><strong style="color:#c4b5fd">HTTP Methods</strong> &nbsp;→&nbsp; <span class="mono">GET, POST, PUT, PATCH, DELETE</span></span>
+            <span style="width:100%"><strong style="color:#c4b5fd">Status Codes</strong> &nbsp;→&nbsp; <span class="mono">200, 201, 204, 400, 401, 403, 404, 500</span></span>
+            <span style="width:100%"><strong style="color:#c4b5fd">DTO</strong> &nbsp;→&nbsp; controls what data enters/leaves the API</span>
+            <span style="width:100%"><strong style="color:#c4b5fd">Validation</strong> &nbsp;→&nbsp; checks request data</span>
+            <span style="width:100%"><strong style="color:#c4b5fd">Exception Handling</strong> &nbsp;→&nbsp; handles errors consistently</span>
+          </div>
+        </div>
+
+        <div class="callout purple" style="margin-top:0">
+          <span class="ico">🏗️</span>
+          <p><strong>Basic architecture:</strong> Controller → Service / Business Logic → Repository / EF Core → SQL Server.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REST ================= -->
+<section id="rest">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker cy">● RESTful Interface</span>
+      <h2>HTTP Methods &amp; <span class="grad">Clean URLs</span></h2>
+      <p>Follow REST principles: resources, statelessness, proper HTTP verbs, and meaningful URLs.</p>
+    </div>
+
+    <div class="tbl-wrap reveal" style="margin-bottom:28px">
+      <table>
+        <thead>
+          <tr><th>HTTP Method</th><th>Purpose</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="m get">GET</span></td><td>Read</td><td>Get products</td></tr>
+          <tr><td><span class="m post">POST</span></td><td>Create</td><td>Add product</td></tr>
+          <tr><td><span class="m put">PUT</span></td><td>Full update / replace</td><td>Replace product</td></tr>
+          <tr><td><span class="m patch">PATCH</span></td><td>Partial update</td><td>Change only price</td></tr>
+          <tr><td><span class="m del">DELETE</span></td><td>Delete</td><td>Delete product</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="reveal">
+        <div class="code">
+          <div class="code-head">
+            <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+            <span class="fn">good-rest-urls.http</span>
+            <button class="copy" data-copy="GET    /api/products
+GET    /api/products/10
+POST   /api/products
+PUT    /api/products/10
+PATCH  /api/products/10
+DELETE /api/products/10">Copy</button>
+          </div>
+<pre><span class="kw">GET</span>    /api/products
+<span class="kw">GET</span>    /api/products/10
+<span class="kw">POST</span>   /api/products
+<span class="kw">PUT</span>    /api/products/10
+<span class="kw">PATCH</span>  /api/products/10
+<span class="kw">DELETE</span> /api/products/10</pre>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="callout green" style="margin-top:0">
+          <span class="ico">✅</span>
+          <p><strong>Good REST URL:</strong> use nouns for resources (<span class="mono">/api/products</span>),
+          never verbs (<span class="mono">/api/getProducts</span>). Let the <strong>HTTP method</strong> express the action.</p>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <span class="sub">REST Principles</span>
+          <div class="chips">
+            <span class="hi">Resources</span>
+            <span class="hi">Statelessness</span>
+            <span class="hi">Proper HTTP verbs</span>
+            <span class="hi">Meaningful URLs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECURITY ================= -->
+<section id="security">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker gr">● Security</span>
+      <h2>Securing <span class="grad">Your Web API</span></h2>
+      <p>Authentication asks <em>who are you?</em> Authorization asks <em>what are you allowed to do?</em></p>
+    </div>
+
+    <div class="split reveal" style="margin-bottom:34px">
+      <div class="side auth-n">
+        <div class="big">🔐</div>
+        <h4>Authentication</h4>
+        <p><strong style="color:#7dd3fc">Who are you?</strong></p>
+      </div>
+      <div class="vs">VS</div>
+      <div class="side auth-z">
+        <div class="big">🛡️</div>
+        <h4>Authorization</h4>
+        <p><strong style="color:#6ee7b7">What are you allowed to do?</strong></p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="flow reveal">
+        <div class="fnode c">HTTPS</div>
+        <div class="farrow">↓</div>
+        <div class="fnode p">Authentication → JWT</div>
+        <div class="farrow">↓</div>
+        <div class="fnode g">Authorization → Roles / Policies</div>
+        <div class="farrow">↓</div>
+        <div class="fnode a">API</div>
+      </div>
+
+      <div class="reveal">
+        <div class="card">
+          <span class="sub">Important Mechanisms</span>
+          <div class="chips">
+            <span class="hi">JWT Bearer Authentication</span>
+            <span>Role-based authorization</span>
+            <span>Policy-based authorization</span>
+            <span>HTTPS / TLS</span>
+            <span>CORS</span>
+            <span>Input validation</span>
+            <span>Rate limiting</span>
+            <span>Secure secrets / configuration</span>
+          </div>
+        </div>
+
+        <div class="code" style="margin-top:16px">
+          <div class="code-head">
+            <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+            <span class="fn">login-flow.txt</span>
+          </div>
+<pre><span class="kw">Login</span>
+  ↓
+<span class="kw">Authentication</span>
+  ↓
+<span class="st">JWT Token</span>
+  ↓
+<span class="kw">Authorization</span>
+  ↓
+<span class="kw">Role / Policy</span>
+  ↓
+<span class="kw">API Access</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RUNTIME & HOST ================= -->
+<section id="runtime">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker am">● Runtime &amp; Host</span>
+      <h2>Where Your App <span class="grad">Actually Runs</span></h2>
+      <p>The runtime executes your code; the host manages its lifetime, configuration, and infrastructure.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card reveal">
+        <span class="sub">05 · ASP.NET Core Runtime Environment</span>
+        <h3>The .NET Runtime</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin:10px 0 16px">
+          Executes the application and provides the services required to run it.
+        </p>
+        <div class="flow" style="padding:16px;background:rgba(0,0,0,.2)">
+          <div class="fnode p" style="max-width:100%">.NET Runtime</div>
+          <div class="farrow sm">├──</div>
+          <div class="fnode" style="max-width:100%">CLR — Common Language Runtime</div>
+          <div class="farrow sm">├──</div>
+          <div class="fnode" style="max-width:100%">Garbage Collection</div>
+          <div class="farrow sm">├──</div>
+          <div class="fnode" style="max-width:100%">JIT — Just-In-Time Compiler</div>
+          <div class="farrow sm">├──</div>
+          <div class="fnode" style="max-width:100%">Exception Handling</div>
+          <div class="farrow sm">└──</div>
+          <div class="fnode" style="max-width:100%">Base Class Libraries</div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <span class="sub">06 · ASP.NET Core Host</span>
+        <h3>Manages Application Lifetime</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin:10px 0 14px">The Host handles:</p>
+        <div class="chips" style="margin-bottom:16px">
+          <span>Application startup</span>
+          <span>Configuration</span>
+          <span>Dependency Injection</span>
+          <span>Logging</span>
+          <span>Server configuration</span>
+          <span>Application shutdown</span>
+        </div>
+        <div class="flow" style="padding:14px;background:rgba(0,0,0,.2)">
+          <div class="fnode c" style="max-width:100%">Program.cs</div>
+          <div class="farrow sm">↓</div>
+          <div class="fnode p" style="max-width:100%">Host</div>
+          <div class="farrow sm">↓</div>
+          <div class="fnode a" style="max-width:100%">Kestrel</div>
+          <div class="farrow sm">↓</div>
+          <div class="fnode g" style="max-width:100%">Middleware Pipeline</div>
+          <div class="farrow sm">↓</div>
+          <div class="fnode" style="max-width:100%">Controller / Endpoint</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Environments -->
+    <div class="reveal" style="margin-top:26px">
+      <div class="card">
+        <span class="sub">Common Environments</span>
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="card" style="text-align:center;background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3)">
+            <div style="font-size:1.4rem">🛠️</div>
+            <h3 style="font-size:.98rem;margin-top:6px;color:#7dd3fc">Development</h3>
+          </div>
+          <div class="card" style="text-align:center;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3)">
+            <div style="font-size:1.4rem">🧪</div>
+            <h3 style="font-size:.98rem;margin-top:6px;color:#fcd34d">Staging</h3>
+          </div>
+          <div class="card" style="text-align:center;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)">
+            <div style="font-size:1.4rem">🚀</div>
+            <h3 style="font-size:.98rem;margin-top:6px;color:#6ee7b7">Production</h3>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="code">
+            <div class="code-head">
+              <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+              <span class="fn">Program.cs</span>
+              <button class="copy" data-copy="if (app.Environment.IsDevelopment())
+{
+    // Development configuration
+}
+
+app.Environment.IsProduction();
+app.Environment.IsStaging();
+app.Environment.EnvironmentName;">Copy</button>
+            </div>
+<pre><span class="kw">if</span> (app.Environment.IsDevelopment())
+{
+    <span class="cm">// Development configuration</span>
+}
+
+app.Environment.IsProduction();
+app.Environment.IsStaging();
+app.Environment.EnvironmentName;</pre>
+          </div>
+
+          <div>
+            <div class="code" style="margin-bottom:14px">
+              <div class="code-head">
+                <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+                <span class="fn">environment variable</span>
+              </div>
+<pre>ASPNETCORE_ENVIRONMENT=Development</pre>
+            </div>
+            <div class="card">
+              <span class="sub">Configuration Files</span>
+              <div class="chips">
+                <span class="hi">appsettings.json</span>
+                <span>appsettings.Development.json</span>
+                <span>appsettings.Production.json</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KESTREL ================= -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker cy">● 07 · Embedded HTTP Server</span>
+      <h2><span class="grad">Kestrel</span> — The Cross-Platform Web Server</h2>
+      <p>Kestrel is ASP.NET Core's cross-platform web server. It receives HTTP requests and can listen for HTTP/HTTPS directly.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="flow reveal">
+        <div class="fnode c">Browser / Client</div>
+        <div class="farrow">↓</div>
+        <div class="fnode a">Kestrel</div>
+        <div class="farrow">↓</div>
+        <div class="fnode p">ASP.NET Core App</div>
+      </div>
+
+      <div class="flow reveal">
+        <div class="fnode c">Internet</div>
+        <div class="farrow">↓</div>
+        <div class="fnode a">Nginx / IIS / Apache</div>
+        <div class="farrow">↓</div>
+        <div class="fnode" style="background:linear-gradient(135deg,rgba(251,191,36,.35),rgba(251,191,36,.12));border-color:rgba(251,191,36,.5);color:#fde68a">Kestrel</div>
+        <div class="farrow">↓</div>
+        <div class="fnode p">ASP.NET Core</div>
+      </div>
+    </div>
+
+    <div class="callout amber reveal" style="max-width:none">
+      <span class="ico">💡</span>
+      <p><strong>Production tip:</strong> Kestrel can run directly, but for production it often works
+      <strong>behind a reverse proxy</strong> such as IIS, Nginx, or Apache — which handles TLS termination,
+      load balancing, and static files while Kestrel focuses on app requests.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MIDDLEWARE ================= -->
+<section id="middleware">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● 08 · Middleware</span>
+      <h2>The <span class="grad">HTTP Pipeline</span></h2>
+      <p>Middleware is software in the HTTP request/response pipeline. Each component can process the request,
+        call the next middleware, and then process the response on the way back.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="flow reveal">
+        <div class="fnode c">Request</div>
+        <div class="farrow">↓</div>
+        <div class="fnode">Exception Handling</div>
+        <div class="farrow sm">↓</div>
+        <div class="fnode">HTTPS</div>
+        <div class="farrow sm">↓</div>
+        <div class="fnode">CORS</div>
+        <div class="farrow sm">↓</div>
+        <div class="fnode p">Authentication</div>
+        <div class="farrow sm">↓</div>
+        <div class="fnode p">Authorization</div>
+        <div class="farrow sm">↓</div>
+        <div class="fnode g">Routing / Endpoint</div>
+        <div class="farrow">↓</div>
+        <div class="fnode a">Response</div>
+      </div>
+
+      <div class="reveal">
+        <div class="card" style="margin-bottom:16px">
+          <span class="sub">Each Middleware Can</span>
+          <div class="flow" style="padding:16px;background:rgba(0,0,0,.2)">
+            <div class="fnode c" style="max-width:100%">Process request</div>
+            <div class="farrow sm">↓</div>
+            <div class="fnode p" style="max-width:100%">Call next middleware</div>
+            <div class="farrow sm">↓</div>
+            <div class="fnode g" style="max-width:100%">Process response</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="sub">Common Middleware Examples</span>
+          <div class="chips">
+            <span class="hi">Exception handling</span>
+            <span class="hi">Authentication</span>
+            <span class="hi">Authorization</span>
+            <span>CORS</span>
+            <span>Logging</span>
+            <span>Routing</span>
+            <span>HTTPS redirection</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GLOSSARY ================= -->
+<section id="glossary">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker am">● Terms &amp; Abbreviations</span>
+      <h2>One-Page <span class="grad">Glossary</span></h2>
+      <p>Search any term, abbreviation, or meaning. 25+ entries covering the full Web API vocabulary.</p>
+    </div>
+
+    <div class="search-wrap reveal">
+      <span class="si">🔍</span>
+      <input type="text" id="search" placeholder="Search terms… e.g. JWT, CORS, Kestrel, DTO" autocomplete="off">
+    </div>
+
+    <div class="grid-3" id="glossary-grid">
+      <div class="gcard reveal"><div class="term">API</div><div class="full">Application Programming Interface</div><div class="mean">Communication between applications.</div></div>
+      <div class="gcard reveal"><div class="term">Web API</div><div class="full">Web Application Programming Interface</div><div class="mean">API accessed over HTTP/HTTPS.</div></div>
+      <div class="gcard reveal"><div class="term">REST</div><div class="full">Representational State Transfer</div><div class="mean">Architecture style for Web APIs.</div></div>
+      <div class="gcard reveal"><div class="term">HTTP</div><div class="full">HyperText Transfer Protocol</div><div class="mean">Communication protocol.</div></div>
+      <div class="gcard reveal"><div class="term">HTTPS</div><div class="full">HyperText Transfer Protocol Secure</div><div class="mean">Encrypted HTTP.</div></div>
+      <div class="gcard reveal"><div class="term">GET</div><div class="full">—</div><div class="mean">Read data.</div></div>
+      <div class="gcard reveal"><div class="term">POST</div><div class="full">—</div><div class="mean">Create data.</div></div>
+      <div class="gcard reveal"><div class="term">PUT</div><div class="full">—</div><div class="mean">Full update / replace.</div></div>
+      <div class="gcard reveal"><div class="term">PATCH</div><div class="full">—</div><div class="mean">Partial update.</div></div>
+      <div class="gcard reveal"><div class="term">DELETE</div><div class="full">—</div><div class="mean">Delete data.</div></div>
+      <div class="gcard reveal"><div class="term">JWT</div><div class="full">JSON Web Token</div><div class="mean">Token-based authentication.</div></div>
+      <div class="gcard reveal"><div class="term">JSON</div><div class="full">JavaScript Object Notation</div><div class="mean">Common API data format.</div></div>
+      <div class="gcard reveal"><div class="term">DTO</div><div class="full">Data Transfer Object</div><div class="mean">Transfers required data between layers.</div></div>
+      <div class="gcard reveal"><div class="term">DI</div><div class="full">Dependency Injection</div><div class="mean">Provides required dependencies.</div></div>
+      <div class="gcard reveal"><div class="term">IoC</div><div class="full">Inversion of Control</div><div class="mean">Control of object creation is delegated.</div></div>
+      <div class="gcard reveal"><div class="term">CORS</div><div class="full">Cross-Origin Resource Sharing</div><div class="mean">Controls requests from different origins.</div></div>
+      <div class="gcard reveal"><div class="term">ORM</div><div class="full">Object-Relational Mapping</div><div class="mean">Maps objects to database tables.</div></div>
+      <div class="gcard reveal"><div class="term">EF Core</div><div class="full">Entity Framework Core</div><div class="mean">.NET ORM.</div></div>
+      <div class="gcard reveal"><div class="term">SQL</div><div class="full">Structured Query Language</div><div class="mean">Database query language.</div></div>
+      <div class="gcard reveal"><div class="term">CRUD</div><div class="full">Create, Read, Update, Delete</div><div class="mean">Basic database operations.</div></div>
+      <div class="gcard reveal"><div class="term">Kestrel</div><div class="full">ASP.NET Core Web Server</div><div class="mean">Receives HTTP requests.</div></div>
+      <div class="gcard reveal"><div class="term">IIS</div><div class="full">Internet Information Services</div><div class="mean">Microsoft web server.</div></div>
+      <div class="gcard reveal"><div class="term">URL</div><div class="full">Uniform Resource Locator</div><div class="mean">Address of an API/resource.</div></div>
+      <div class="gcard reveal"><div class="term">URI</div><div class="full">Uniform Resource Identifier</div><div class="mean">Identifies a resource.</div></div>
+      <div class="gcard reveal"><div class="term">SSL/TLS</div><div class="full">Secure Sockets Layer / Transport Layer Security</div><div class="mean">Secures network communication.</div></div>
+      <div class="gcard reveal"><div class="term">DNS</div><div class="full">Domain Name System</div><div class="mean">Converts domain names to IP addresses.</div></div>
+      <div class="gcard reveal"><div class="term">IP</div><div class="full">Internet Protocol</div><div class="mean">Identifies network devices.</div></div>
+      <div class="gcard reveal"><div class="term">HTTP Status</div><div class="full">HTTP Response Status Code</div><div class="mean">Indicates request result.</div></div>
+      <div class="gcard reveal"><div class="term">CLR</div><div class="full">Common Language Runtime</div><div class="mean">Executes .NET code and provides runtime services.</div></div>
+      <div class="gcard reveal"><div class="term">JIT</div><div class="full">Just-In-Time Compiler</div><div class="mean">Compiles IL to machine code at runtime.</div></div>
+    </div>
+
+    <div class="no-res" id="no-res">No matching terms found. Try another search.</div>
+  </div>
+</section>
+
+<!-- ================= STATUS CODES ================= -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker gr">● HTTP Status Codes</span>
+      <h2>Know Your <span class="grad">Response Codes</span></h2>
+      <p>Every API response tells the client what happened. These are the ones you'll use most.</p>
+    </div>
+
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead><tr><th style="width:180px">Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sc ok">200</span></td><td>OK / Success</td></tr>
+          <tr><td><span class="sc ok">201</span></td><td>Created</td></tr>
+          <tr><td><span class="sc ok">204</span></td><td>No Content</td></tr>
+          <tr><td><span class="sc warn">400</span></td><td>Bad Request</td></tr>
+          <tr><td><span class="sc warn">401</span></td><td>Unauthorized / Authentication required</td></tr>
+          <tr><td><span class="sc warn">403</span></td><td>Forbidden / Not permitted</td></tr>
+          <tr><td><span class="sc err">404</span></td><td>Not Found</td></tr>
+          <tr><td><span class="sc err">409</span></td><td>Conflict</td></tr>
+          <tr><td><span class="sc err">500</span></td><td>Internal Server Error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EF CORE ================= -->
+<section id="efcore">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker cy">● EF Core</span>
+      <h2><span class="grad">Reverse Engineering</span></h2>
+      <p>Reverse Engineering means creating .NET entity classes and a DbContext from an existing database.</p>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="flow reveal">
+        <div class="fnode c">SQL Server</div>
+        <div class="farrow">↓</div>
+        <div class="fnode">Tables</div>
+        <div class="farrow">↓</div>
+        <div class="fnode a">EF Core Reverse Engineering</div>
+        <div class="farrow">↓</div>
+        <div class="fnode g">DbContext + Entity Classes</div>
+      </div>
+
+      <div class="reveal">
+        <div class="code">
+          <div class="code-head">
+            <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+            <span class="fn">terminal</span>
+            <button class="copy" data-copy="dotnet ef dbcontext scaffold &quot;Connection_String&quot; Microsoft.EntityFrameworkCore.SqlServer
+
+dotnet ef dbcontext scaffold &quot;Server=.;Database=CollegeDB;Trusted_Connection=True;TrustServerCertificate=True&quot; Microsoft.EntityFrameworkCore.SqlServer">Copy</button>
+          </div>
+<pre><span class="cm"># Common command</span>
+dotnet ef dbcontext scaffold <span class="st">"Connection_String"</span> Microsoft.EntityFrameworkCore.SqlServer
+
+<span class="cm"># Example</span>
+dotnet ef dbcontext scaffold <span class="st">"Server=.;Database=CollegeDB;Trusted_Connection=True;TrustServerCertificate=True"</span> Microsoft.EntityFrameworkCore.SqlServer</pre>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <span class="sub">It Generates</span>
+          <div class="code" style="border:none;background:transparent">
+<pre style="padding:0;font-size:.83rem">Models/
+   Student.cs
+   Course.cs
+   Teacher.cs
+
+CollegeDbContext.cs</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead><tr><th>Approach</th><th>Direction</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:#c4b5fd">Code First</strong></td><td>C# Classes <span class="mono">→</span> Database</td></tr>
+          <tr><td><strong style="color:#7dd3fc">Database First / Reverse Engineering</strong></td><td>Database <span class="mono">→</span> C# Classes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ARCHITECTURE ================= -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker am">● Remember This</span>
+      <h2>Complete <span class="grad">Architecture</span></h2>
+      <p>The full request path — from the client's browser all the way down to SQL Server and back.</p>
+    </div>
+
+    <div class="flow reveal" style="padding:34px 18px">
+      <div class="fnode c">Client</div>
+      <div class="farrow">↓</div>
+      <div class="fnode">HTTP / HTTPS</div>
+      <div class="farrow">↓</div>
+      <div class="fnode a">Kestrel</div>
+      <div class="farrow">↓</div>
+      <div class="fnode p">Middleware</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode p">Authentication</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode p">Authorization</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode p">Routing</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode g">Controller / Minimal API</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode g">DTO</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode g">Service / Business Logic</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode" style="background:linear-gradient(135deg,rgba(244,114,182,.3),rgba(244,114,182,.1));border-color:rgba(244,114,182,.45);color:#f9a8d4">EF Core</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode" style="background:linear-gradient(135deg,rgba(244,114,182,.3),rgba(244,114,182,.1));border-color:rgba(244,114,182,.45);color:#f9a8d4">DbContext</div>
+      <div class="farrow sm">↓</div>
+      <div class="fnode" style="background:linear-gradient(135deg,rgba(52,211,153,.35),rgba(52,211,153,.12));border-color:rgba(52,211,153,.5);color:#a7f3d0">SQL Server</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REVISION ================= -->
+<section id="revision">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker gr">⭐ One-Line Revision</span>
+      <h2>Most Important <span class="grad">Interview Lines</span></h2>
+      <p>The fastest possible recap — one line per concept.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="oneliner reveal"><span class="k">API</span><span class="v">Allows applications to communicate.</span></div>
+      <div class="oneliner reveal"><span class="k">Web API</span><span class="v">Communication through HTTP.</span></div>
+      <div class="oneliner reveal"><span class="k">REST</span><span class="v">Resource-based API design.</span></div>
+      <div class="oneliner reveal"><span class="k">GET</span><span class="v">Read data.</span></div>
+      <div class="oneliner reveal"><span class="k">POST</span><span class="v">Create data.</span></div>
+      <div class="oneliner reveal"><span class="k">PUT</span><span class="v">Complete update / replace.</span></div>
+      <div class="oneliner reveal"><span class="k">PATCH</span><span class="v">Partial update.</span></div>
+      <div class="oneliner reveal"><span class="k">DELETE</span><span class="v">Remove data.</span></div>
+      <div class="oneliner reveal"><span class="k">Authentication</span><span class="v">Who are you? 🔐</span></div>
+      <div class="oneliner reveal"><span class="k">Authorization</span><span class="v">What can you do / access? 🛡️</span></div>
+      <div class="oneliner reveal"><span class="k">JWT</span><span class="v">Token used commonly for authentication.</span></div>
+      <div class="oneliner reveal"><span class="k">CORS</span><span class="v">Controls cross-origin browser requests.</span></div>
+      <div class="oneliner reveal"><span class="k">Kestrel</span><span class="v">ASP.NET Core web server.</span></div>
+      <div class="oneliner reveal"><span class="k">Host</span><span class="v">Manages application lifetime / configuration / DI.</span></div>
+      <div class="oneliner reveal"><span class="k">Middleware</span><span class="v">Processes HTTP requests/responses in a pipeline.</span></div>
+      <div class="oneliner reveal"><span class="k">DI</span><span class="v">Injects dependencies instead of creating them manually.</span></div>
+      <div class="oneliner reveal"><span class="k">DTO</span><span class="v">Data Transfer Object — shapes API data.</span></div>
+      <div class="oneliner reveal"><span class="k">EF Core</span><span class="v">ORM for .NET applications.</span></div>
+      <div class="oneliner reveal"><span class="k">Reverse Eng.</span><span class="v">Database → Entity Classes + DbContext.</span></div>
+      <div class="oneliner reveal"><span class="k">HTTPS</span><span class="v">Encrypted HTTP communication.</span></div>
+    </div>
+
+    <div class="callout purple reveal" style="max-width:none;margin-top:30px">
+      <span class="ico">🎯</span>
+      <p><strong>The golden rule:</strong> Authentication happens before Authorization, both live in the middleware
+      pipeline, and everything runs on <strong>Kestrel</strong> — managed by the <strong>Host</strong> from <strong>Program.cs</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="fg">ASP.NET Core Web API — Short &amp; Crisp Notes + One-Page Revision Sheet</span>
+    Designing · Building · REST · Security · Runtime · Host · Kestrel · Middleware · Glossary · EF Core · Architecture
+  </div>
+</footer>
+
+<script>
+/* ================= SCROLL PROGRESS ================= */
+const bar = document.getElementById('progress');
+function onScroll(){
+  const h = document.documentElement;
+  const max = h.scrollHeight - h.clientHeight;
+  bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+/* ================= REVEAL ON SCROLL ================= */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach((e, i)=>{
+    if(e.isIntersecting){
+      const delay = Math.min(i * 45, 220);
+      setTimeout(()=> e.target.classList.add('in'), delay);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.1, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ================= GLOSSARY SEARCH ================= */
+const searchInput = document.getElementById('search');
+const gCards = Array.from(document.querySelectorAll('#glossary-grid .gcard'));
+const noRes = document.getElementById('no-res');
+
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value.trim().toLowerCase();
+  let visible = 0;
+
+  gCards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    const match = q === '' || text.includes(q);
+    card.classList.toggle('hide', !match);
+    if(match) visible++;
+  });
+
+  noRes.classList.toggle('show', visible === 0);
+});
+
+/* ================= COPY BUTTONS ================= */
+document.querySelectorAll('.copy').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const text = btn.dataset.copy;
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('done');
+    setTimeout(()=>{
+      btn.textContent = original;
+      btn.classList.remove('done');
+    }, 1500);
+  });
+});
+
+/* ================= SMOOTH NAV (fallback) ================= */
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){
+      e.preventDefault();
+      window.scrollTo({ top: target.offsetTop - 70, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+</body>
+</html>

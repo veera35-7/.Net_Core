@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit V — ASP.NET Core Web API | Complete Hands-On Application Development</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0e14;
+            --sidebar-bg: #0d1117;
+            --card-bg: #161b22;
+            --card-hover: #1c2129;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --text-dim: #6e7681;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --accent-dim: rgba(88, 166, 255, 0.15);
+            --border: #21262d;
+            --border-light: #30363d;
+            --code-bg: #0d1117;
+            --success: #238636;
+            --success-hover: #2ea043;
+            --success-bg: rgba(35, 134, 54, 0.15);
+            --warning: #d29922;
+            --warning-bg: rgba(210, 153, 34, 0.15);
+            --danger: #da3633;
+            --danger-bg: rgba(218, 54, 51, 0.15);
+            --purple: #bc8cff;
+            --purple-bg: rgba(188, 140, 255, 0.15);
+            --cyan: #39d2c0;
+            --cyan-bg: rgba(57, 210, 192, 0.15);
+            --orange: #f0883e;
+            --sidebar-width: 320px;
+            --header-height: 64px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        /* ===== HEADER ===== */
+        .top-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--header-height);
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-badge {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            color: #fff; font-size: 0.7em; font-weight: 700;
+            padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;
+        }
+        .header-title { font-size: 1.1em; font-weight: 700; color: #fff; }
+        .header-title span { color: var(--accent); }
+        .header-subtitle { font-size: 0.75em; color: var(--text-muted); font-weight: 400; }
+        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .header-btn {
+            background: var(--card-bg); border: 1px solid var(--border-light);
+            color: var(--text-main); padding: 7px 14px; border-radius: 6px;
+            cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.78em;
+            font-weight: 500; transition: all 0.2s; display: flex;
+            align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .header-btn:hover { background: var(--card-hover); border-color: var(--accent); color: #fff; }
+        .header-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .header-btn.primary:hover { background: var(--accent-hover); }
+        .header-btn.success { background: var(--success); border-color: var(--success); color: #fff; }
+        .header-btn.success:hover { background: var(--success-hover); }
+        .header-btn.purple { background: var(--purple); border-color: var(--purple); color: #fff; }
+        .header-btn.purple:hover { background: #cda3ff; }
+
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; margin-top: var(--header-height); min-height: calc(100vh - var(--header-height)); }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            height: calc(100vh - var(--header-height));
+            position: fixed; top: var(--header-height); left: 0;
+            overflow-y: auto; padding: 16px 0; z-index: 900;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-label {
+            font-size: 0.65em; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--text-dim); padding: 8px 16px 4px;
+        }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer;
+            transition: all 0.15s; color: var(--text-muted);
+            font-size: 0.82em; font-weight: 400;
+            border-left: 2px solid transparent; margin-bottom: 1px;
+        }
+        .nav-item:hover { background: var(--card-bg); color: var(--text-main); }
+        .nav-item.active {
+            background: var(--accent-dim); color: var(--accent);
+            border-left-color: var(--accent); font-weight: 500;
+        }
+        .nav-item.completed { color: var(--success); }
+        .nav-item.completed .nav-num { background: var(--success); color: #fff; }
+        .nav-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--border); color: var(--text-dim);
+            font-size: 0.65em; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+        .nav-item.active .nav-num { background: var(--accent); color: #fff; }
+        .nav-item.syllabus-nav .nav-num { background: var(--purple); color: #fff; }
+
+        /* ===== PROGRESS ===== */
+        .progress-section { padding: 12px 16px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 0.72em; color: var(--text-muted); margin-bottom: 6px; }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width); flex: 1;
+            padding: 32px 40px 80px; max-width: 1000px; min-width: 0;
+        }
+
+        .content-section { display: none; animation: fadeIn 0.35s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .section-number { font-size: 0.7em; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 6px; }
+        .section-title { font-size: 1.75em; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 8px; }
+        .section-desc { color: var(--text-muted); font-size: 0.92em; }
+
+        h3 { color: var(--accent); font-size: 1.15em; font-weight: 700; margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
+        h4 { color: #fff; font-size: 1em; font-weight: 600; margin: 20px 0 10px; }
+        p { margin-bottom: 14px; color: var(--text-muted); font-size: 0.92em; }
+        p strong { color: var(--text-main); }
+        ul, ol { margin-bottom: 14px; padding-left: 22px; color: var(--text-muted); font-size: 0.92em; }
+        li { margin-bottom: 6px; }
+        li strong { color: var(--text-main); }
+
+        /* ===== SYLLABUS CARD (Official document look) ===== */
+        .syllabus-doc {
+            background: #fff; color: #1a1a1a; border-radius: 10px;
+            overflow: hidden; margin: 20px 0 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid #ddd;
+        }
+        .syllabus-doc-header {
+            display: grid;
+            grid-template-columns: 140px 1fr 80px;
+            background: #f0f0f0;
+            border-bottom: 2px solid #333;
+            font-weight: 700; font-size: 0.85em;
+        }
+        .syllabus-doc-header > div {
+            padding: 10px 14px; border-right: 1px solid #ccc;
+        }
+        .syllabus-doc-header > div:last-child { border-right: none; text-align: center; }
+        .syllabus-doc-body { padding: 14px 16px; font-size: 0.88em; line-height: 1.7; color: #2a2a2a; }
+        .syllabus-doc-body strong { color: #000; }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
+        .dashboard-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 10px; padding: 18px 20px; cursor: pointer;
+            transition: all 0.2s; display: flex; flex-direction: column; gap: 6px;
+        }
+        .dashboard-card:hover { border-color: var(--accent); background: var(--card-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .dashboard-card .dc-num { font-size: 0.75em; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+        .dashboard-card .dc-title { font-size: 0.95em; font-weight: 600; color: #fff; line-height: 1.4; }
+        .dashboard-card .dc-desc { font-size: 0.78em; color: var(--text-muted); margin-top: 4px; }
+        .dashboard-card .dc-badge {
+            display: inline-block; font-size: 0.65em; font-weight: 600;
+            padding: 2px 8px; border-radius: 20px;
+            background: var(--border); color: var(--text-dim);
+            align-self: flex-start; margin-top: 6px;
+        }
+
+        /* ===== CARDS ===== */
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; transition: all 0.2s; }
+        .card:hover { border-color: var(--border-light); background: var(--card-hover); }
+        .card-title { font-size: 0.95em; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .card-title i { color: var(--accent); font-size: 0.9em; }
+        .card p { font-size: 0.88em; margin-bottom: 8px; }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .code-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #1c2129; padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Fira Code', monospace; font-size: 0.8em;
+            color: var(--text-muted); flex-wrap: wrap; gap: 8px;
+        }
+        .code-header-left { display: flex; align-items: center; gap: 8px; }
+        .code-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .code-dot.red { background: #ff5f56; }
+        .code-dot.yellow { background: #ffbd2e; }
+        .code-dot.green { background: #27c93f; }
+        .code-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn {
+            background: var(--border); color: var(--text-main);
+            border: 1px solid var(--border-light); padding: 6px 12px;
+            border-radius: 6px; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 0.78em; font-weight: 500;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
+            text-decoration: none; white-space: nowrap;
+        }
+        .btn:hover { background: var(--border-light); color: #fff; }
+        .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-success:hover { background: var(--success-hover); border-color: var(--success-hover); }
+        .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .btn-danger:hover { background: #e5534b; }
+        .btn-warning { background: var(--warning); color: #fff; border-color: var(--warning); }
+        .btn-warning:hover { background: #e3b341; }
+        .btn-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+        .btn-purple:hover { background: #cda3ff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+        pre {
+            margin: 0 !important; border-radius: 0 !important;
+            font-family: 'Fira Code', monospace !important;
+            font-size: 0.85em !important; background: var(--code-bg) !important;
+            padding: 20px !important; overflow-x: auto; line-height: 1.65 !important;
+        }
+        code { font-family: 'Fira Code', monospace !important; font-size: 0.88em !important; }
+
+        /* ===== TERMINAL ===== */
+        .terminal { background: #0c0c0c; border: 1px solid #2a2a2a; border-radius: 10px; overflow: hidden; margin-bottom: 20px; font-family: 'Fira Code', monospace; }
+        .terminal-header { background: #1a1a1a; padding: 8px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2a2a2a; }
+        .terminal-body { padding: 16px 18px; font-size: 0.82em; line-height: 1.7; color: #ccc; max-height: 400px; overflow-y: auto; }
+        .terminal-body .prompt { color: var(--success); }
+        .terminal-body .info { color: #569cd6; }
+        .terminal-body .success-text { color: #6a9955; }
+
+        /* ===== INFO BOXES ===== */
+        .info-box { border-radius: 8px; padding: 16px 18px; margin: 18px 0; font-size: 0.88em; border-left: 4px solid; }
+        .info-box.blue { background: var(--accent-dim); border-color: var(--accent); }
+        .info-box.green { background: var(--success-bg); border-color: var(--success); }
+        .info-box.yellow { background: var(--warning-bg); border-color: var(--warning); }
+        .info-box.red { background: var(--danger-bg); border-color: var(--danger); }
+        .info-box.purple { background: var(--purple-bg); border-color: var(--purple); }
+        .info-box.cyan { background: var(--cyan-bg); border-color: var(--cyan); }
+        .info-box strong { color: #fff; }
+        .info-box p { margin-bottom: 6px; }
+        .info-box p:last-child { margin-bottom: 0; }
+
+        /* ===== FLOW DIAGRAMS ===== */
+        .flow-diagram { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+        .flow-node {
+            background: var(--card-bg); border: 1px solid var(--border-light);
+            border-radius: 8px; padding: 10px 22px; font-size: 0.85em;
+            font-weight: 600; color: var(--text-main); text-align: center;
+            min-width: 200px; transition: all 0.2s; cursor: default;
+        }
+        .flow-node.clickable { cursor: pointer; }
+        .flow-node.clickable:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); transform: scale(1.03); }
+        .flow-node.highlight-blue { border-color: var(--accent); color: var(--accent); }
+        .flow-node.highlight-green { border-color: var(--success); color: var(--success); }
+        .flow-node.highlight-yellow { border-color: var(--warning); color: var(--warning); }
+        .flow-node.highlight-red { border-color: var(--danger); color: var(--danger); }
+        .flow-node.highlight-purple { border-color: var(--purple); color: var(--purple); }
+        .flow-node.highlight-cyan { border-color: var(--cyan); color: var(--cyan); }
+        .flow-arrow { color: var(--text-dim); font-size: 1.2em; line-height: 1; padding: 4px 0; }
+
+        /* ===== SYLLABUS FLOW ===== */
+        .syllabus-flow-tree {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0; margin: 24px 0;
+        }
+        .syllabus-root {
+            background: linear-gradient(135deg, var(--purple), var(--accent));
+            color: #fff; font-weight: 700; font-size: 0.95em;
+            padding: 14px 32px; border-radius: 12px;
+            text-align: center; box-shadow: 0 8px 24px rgba(188,140,255,0.3);
+            max-width: 100%;
+        }
+        .syllabus-root small { display: block; font-size: 0.7em; opacity: 0.85; font-weight: 500; margin-top: 4px; }
+        .syllabus-trunk { width: 2px; height: 24px; background: var(--border-light); }
+        .syllabus-branches {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px; width: 100%; margin-top: 4px;
+        }
+        .syllabus-topic {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px;
+            transition: all 0.25s; cursor: pointer;
+            border-top: 3px solid var(--accent);
+            position: relative;
+        }
+        .syllabus-topic:hover {
+            border-color: var(--accent); background: var(--card-hover);
+            transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .syllabus-topic.t1 { border-top-color: var(--accent); }
+        .syllabus-topic.t2 { border-top-color: var(--success); }
+        .syllabus-topic.t3 { border-top-color: var(--warning); }
+        .syllabus-topic.t4 { border-top-color: var(--danger); }
+        .syllabus-topic.t5 { border-top-color: var(--purple); }
+        .syllabus-topic.t6 { border-top-color: var(--cyan); }
+        .syllabus-topic.t7 { border-top-color: var(--orange); }
+        .syllabus-topic.t8 { border-top-color: #ff7b72; }
+
+        .syllabus-topic .st-num {
+            font-size: 0.65em; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-dim); margin-bottom: 4px;
+        }
+        .syllabus-topic .st-title {
+            font-size: 0.92em; font-weight: 700; color: #fff;
+            line-height: 1.35; margin-bottom: 8px;
+        }
+        .syllabus-topic .st-desc {
+            font-size: 0.76em; color: var(--text-muted); margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .syllabus-topic .st-sessions {
+            display: flex; flex-wrap: wrap; gap: 4px;
+        }
+        .session-pill {
+            font-size: 0.65em; font-weight: 600;
+            padding: 2px 8px; border-radius: 20px;
+            background: var(--border); color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .session-pill:hover {
+            background: var(--accent); color: #fff; transform: scale(1.05);
+        }
+        .syllabus-topic.t1 .session-pill:hover { background: var(--accent); }
+        .syllabus-topic.t2 .session-pill:hover { background: var(--success); }
+        .syllabus-topic.t3 .session-pill:hover { background: var(--warning); }
+        .syllabus-topic.t4 .session-pill:hover { background: var(--danger); }
+        .syllabus-topic.t5 .session-pill:hover { background: var(--purple); }
+        .syllabus-topic.t6 .session-pill:hover { background: var(--cyan); }
+        .syllabus-topic.t7 .session-pill:hover { background: var(--orange); }
+        .syllabus-topic.t8 .session-pill:hover { background: #ff7b72; }
+
+        /* ===== MAP TABLE ===== */
+        .syllabus-map-table {
+            width: 100%; border-collapse: collapse; margin: 16px 0;
+            font-size: 0.85em; background: var(--card-bg);
+            border-radius: 10px; overflow: hidden;
+        }
+        .syllabus-map-table th {
+            background: #1c2129; color: #fff; font-weight: 600;
+            padding: 12px 16px; text-align: left;
+            border-bottom: 1px solid var(--border); font-size: 0.85em;
+        }
+        .syllabus-map-table td {
+            padding: 12px 16px; border-bottom: 1px solid var(--border);
+            color: var(--text-muted); vertical-align: top;
+        }
+        .syllabus-map-table tr:last-child td { border-bottom: none; }
+        .syllabus-map-table tr:hover td { background: var(--card-hover); }
+        .syllabus-map-table .topic-cell {
+            font-weight: 600; color: #fff;
+        }
+
+        /* ===== GRID ===== */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 16px 0; }
+
+        /* ===== CRUD CARDS ===== */
+        .crud-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-align: center; transition: all 0.2s; cursor: pointer; }
+        .crud-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .crud-card .icon { font-size: 1.8em; margin-bottom: 10px; }
+        .crud-card .label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .crud-card .method { font-family: 'Fira Code', monospace; font-size: 0.8em; font-weight: 600; }
+        .crud-card.create { border-top: 3px solid var(--success); }
+        .crud-card.create .icon, .crud-card.create .label { color: var(--success); }
+        .crud-card.read { border-top: 3px solid var(--accent); }
+        .crud-card.read .icon, .crud-card.read .label { color: var(--accent); }
+        .crud-card.update { border-top: 3px solid var(--warning); }
+        .crud-card.update .icon, .crud-card.update .label { color: var(--warning); }
+        .crud-card.delete { border-top: 3px solid var(--danger); }
+        .crud-card.delete .icon, .crud-card.delete .label { color: var(--danger); }
+
+        /* ===== STATUS CODE CARDS ===== */
+        .status-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .status-card:hover { border-color: var(--border-light); background: var(--card-hover); }
+        .status-card .status-code { font-family: 'Fira Code', monospace; font-weight: 700; font-size: 0.95em; margin-bottom: 4px; }
+        .status-card .status-name { font-size: 0.82em; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .status-card .status-desc { font-size: 0.78em; color: var(--text-muted); }
+        .status-card.s2xx { border-left: 3px solid var(--success); }
+        .status-card.s2xx .status-code { color: var(--success); }
+        .status-card.s4xx { border-left: 3px solid var(--warning); }
+        .status-card.s4xx .status-code { color: var(--warning); }
+        .status-card.s5xx { border-left: 3px solid var(--danger); }
+        .status-card.s5xx .status-code { color: var(--danger); }
+
+        /* ===== EXPANDABLE ===== */
+        .expandable { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+        .expandable-header { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.88em; font-weight: 600; color: var(--text-main); transition: background 0.2s; user-select: none; }
+        .expandable-header:hover { background: var(--card-hover); }
+        .expandable-header .arrow { transition: transform 0.25s; color: var(--text-dim); font-size: 0.8em; }
+        .expandable.open .expandable-header .arrow { transform: rotate(90deg); }
+        .expandable-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease; padding: 0 16px; font-size: 0.85em; color: var(--text-muted); }
+        .expandable.open .expandable-body { max-height: 2000px; padding: 0 16px 16px; }
+
+        /* ===== SWAGGER ===== */
+        .swagger-ui { background: #fff; border-radius: 8px; padding: 0; overflow: hidden; margin: 20px 0; color: #3b4151; font-family: sans-serif; }
+        .swagger-topbar { background: #1b1b1b; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .swagger-topbar .swagger-logo { color: #fff; font-weight: 700; font-size: 1.1em; }
+        .swagger-topbar .swagger-url { background: #333; color: #ccc; padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 0.8em; }
+        .swagger-endpoint { border-bottom: 1px solid #e0e0e0; padding: 0; }
+        .swagger-endpoint-header { display: flex; align-items: center; padding: 10px 20px; cursor: pointer; transition: background 0.15s; }
+        .swagger-endpoint-header:hover { background: #f7f7f7; }
+        .swagger-method { font-size: 0.75em; font-weight: 700; padding: 4px 12px; border-radius: 4px; color: #fff; text-transform: uppercase; min-width: 70px; text-align: center; margin-right: 12px; }
+        .swagger-method.get { background: #61affe; }
+        .swagger-method.post { background: #49cc90; }
+        .swagger-method.put { background: #fca130; }
+        .swagger-method.delete { background: #f93e3e; }
+        .swagger-path { font-family: monospace; font-size: 0.85em; color: #3b4151; font-weight: 600; }
+        .swagger-desc { font-size: 0.78em; color: #999; margin-left: auto; }
+        .swagger-body { padding: 0 20px 16px 102px; display: none; }
+        .swagger-body.open { display: block; }
+        .swagger-response { background: #f7f7f7; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px 16px; font-family: monospace; font-size: 0.8em; margin-top: 10px; white-space: pre-wrap; color: #3b4151; }
+
+        /* ===== SIM ===== */
+        .sim-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .sim-badge { display: inline-block; background: var(--warning-bg); color: var(--warning); font-size: 0.7em; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+        .sim-input { background: var(--bg-color); border: 1px solid var(--border-light); color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 0.85em; width: 100%; margin-bottom: 10px; }
+        .sim-input:focus { outline: none; border-color: var(--accent); }
+        .sim-output { background: #0c0c0c; border: 1px solid #2a2a2a; border-radius: 8px; padding: 14px 16px; font-family: 'Fira Code', monospace; font-size: 0.8em; color: #ccc; min-height: 80px; white-space: pre-wrap; line-height: 1.6; }
+
+        /* ===== NAV BTNS ===== */
+        .section-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); gap: 12px; }
+        .section-nav .btn { padding: 10px 20px; font-size: 0.85em; }
+        .section-nav .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ===== TEACH ===== */
+        .teach-this { background: var(--purple-bg); border: 1px solid var(--purple); border-radius: 8px; padding: 16px 18px; margin: 18px 0; font-size: 0.88em; }
+        .teach-this .teach-label { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--purple); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .teach-this .teach-content { color: var(--text-muted); font-style: italic; line-height: 1.7; }
+        .teach-this .teach-content strong { color: #fff; font-style: normal; }
+
+        /* ===== EXERCISE ===== */
+        .exercise { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+        .exercise-header { padding: 14px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+        .exercise-level { font-size: 0.68em; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .exercise-level.l1 { background: var(--success-bg); color: var(--success); }
+        .exercise-level.l2 { background: var(--accent-dim); color: var(--accent); }
+        .exercise-level.l3 { background: var(--warning-bg); color: var(--warning); }
+        .exercise-level.l4 { background: var(--purple-bg); color: var(--purple); }
+        .exercise-level.l5 { background: var(--danger-bg); color: var(--danger); }
+        .exercise-level.l6 { background: var(--cyan-bg); color: var(--cyan); }
+        .exercise-level.l7 { background: var(--orange); color: #fff; }
+        .exercise-level.l8 { background: var(--purple); color: #fff; }
+        .exercise-title { font-size: 0.92em; font-weight: 600; color: #fff; }
+        .exercise-body { padding: 16px 18px; }
+        .exercise-body p { font-size: 0.85em; }
+
+        /* ===== INTERVIEW ===== */
+        .interview-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+        .interview-q { padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.88em; font-weight: 600; color: var(--text-main); transition: background 0.2s; user-select: none; }
+        .interview-q:hover { background: var(--card-hover); }
+        .interview-q .q-num { color: var(--accent); font-family: 'Fira Code', monospace; font-size: 0.85em; margin-right: 10px; }
+        .interview-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 18px; font-size: 0.85em; color: var(--text-muted); border-top: 1px solid transparent; }
+        .interview-item.open .interview-a { max-height: 500px; padding: 14px 18px; border-top-color: var(--border); }
+        .interview-item.open .interview-q .arrow { transform: rotate(90deg); }
+        .interview-q .arrow { transition: transform 0.25s; color: var(--text-dim); font-size: 0.75em; }
+
+        /* ===== REVISION ===== */
+        .revision-item { display: flex; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.88em; }
+        .revision-item:last-child { border-bottom: none; }
+        .revision-term { font-family: 'Fira Code', monospace; font-weight: 600; color: var(--accent); min-width: 160px; flex-shrink: 0; }
+        .revision-def { color: var(--text-muted); }
+
+        /* ===== CHECKLIST ===== */
+        .checklist { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .checklist li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; font-size: 0.85em; border: 1px solid var(--border); }
+        .checklist li::before { content: "✓"; color: var(--success); font-weight: 700; }
+
+        /* ===== CLASSROOM ===== */
+        body.classroom-mode .sidebar { transform: translateX(-100%); }
+        body.classroom-mode .main-content { margin-left: 0; max-width: 100%; padding: 32px 60px 80px; }
+        body.classroom-mode { font-size: 1.15em; }
+        body.classroom-mode .section-title { font-size: 2em; }
+
+        /* ===== MOBILE ===== */
+        .mobile-toggle { display: none; background: var(--card-bg); border: 1px solid var(--border-light); color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 1em; }
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 24px 20px 60px; }
+            .mobile-toggle { display: flex; }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .checklist { grid-template-columns: 1fr; }
+            .header-actions .header-btn span { display: none; }
+            .header-actions .header-btn { padding: 7px 10px; }
+            .section-title { font-size: 1.4em; }
+            .main-content { padding: 20px 16px 60px; }
+            .top-header { padding: 0 12px; }
+            .header-title { font-size: 0.9em; }
+            .header-subtitle { display: none; }
+            .swagger-endpoint-header { flex-wrap: wrap; gap: 6px; }
+            .swagger-body { padding: 0 12px 12px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .syllabus-doc-header { grid-template-columns: 1fr; }
+            .syllabus-doc-header > div { border-right: none; border-bottom: 1px solid #ccc; }
+        }
+
+        /* ===== MISC ===== */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+        .text-accent { color: var(--accent); }
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-danger { color: var(--danger); }
+        .text-purple { color: var(--purple); }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .inline-code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-family: 'Fira Code', monospace; font-size: 0.82em; color: var(--accent); }
+        .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+        .project-tree { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; font-family: 'Fira Code', monospace; font-size: 0.82em; line-height: 1.9; color: var(--text-muted); margin: 16px 0; }
+        .project-tree .folder { color: var(--accent); font-weight: 600; }
+        .project-tree .file { color: var(--text-main); }
+        .project-tree .cs-file { color: var(--success); }
+        .project-tree .json-file { color: var(--warning); }
+
+        .final-flow { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 30px 0; }
+        .final-flow .flow-node { min-width: 280px; padding: 12px 24px; font-size: 0.9em; }
+
+        .copy-toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success); color: #fff;
+            padding: 12px 24px; border-radius: 8px;
+            font-size: 0.85em; font-weight: 600; z-index: 9999;
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .copy-toast.show { transform: translateX(-50%) translateY(0); }
+
+        .output-panel { background: #0c0c0c; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px 18px; font-family: 'Fira Code', monospace; font-size: 0.8em; color: #ccc; margin-top: 10px; white-space: pre-wrap; line-height: 1.6; display: none; }
+        .output-panel.show { display: block; }
+
+        .explain-panel { background: var(--purple-bg); border: 1px solid var(--purple); border-radius: 8px; padding: 16px 18px; margin-top: 10px; font-size: 0.85em; color: var(--text-muted); display: none; line-height: 1.8; }
+        .explain-panel.show { display: block; }
+        .explain-panel .line-num { color: var(--purple); font-family: 'Fira Code', monospace; font-weight: 600; margin-right: 8px; }
+
+        .endpoint-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85em; }
+        .endpoint-table th { background: var(--card-bg); color: var(--text-main); font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85em; }
+        .endpoint-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+        .endpoint-table tr:hover td { background: var(--card-bg); }
+        .endpoint-table .method-tag { font-family: 'Fira Code', monospace; font-weight: 600; font-size: 0.8em; padding: 2px 8px; border-radius: 4px; }
+        .method-tag.get { background: var(--success-bg); color: var(--success); }
+        .method-tag.post { background: var(--accent-dim); color: var(--accent); }
+        .method-tag.put { background: var(--warning-bg); color: var(--warning); }
+        .method-tag.delete { background: var(--danger-bg); color: var(--danger); }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="top-header">
+    <div class="header-left">
+        <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div>
+            <div class="header-title">ASP.NET Core <span>Web API</span></div>
+            <div class="header-subtitle">From Visual Studio Project Creation to Complete REST API</div>
+        </div>
+        <span class="header-badge" style="background:var(--purple);margin-left:8px;">30 Sessions</span>
+    </div>
+    <div class="header-actions">
+        <button class="header-btn purple" onclick="goToSyllabus()"><i class="fa-solid fa-book"></i> <span>Syllabus</span></button>
+        <button class="header-btn" onclick="goToSection(0)"><i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span></button>
+        <button class="header-btn primary" onclick="goToSection(1)"><i class="fa-solid fa-play"></i> <span>Start</span></button>
+        <button class="header-btn" onclick="goToSection(5)"><i class="fa-solid fa-diagram-project"></i> <span>Flow</span></button>
+        <button class="header-btn success" onclick="goToSection(27)"><i class="fa-solid fa-cubes"></i> <span>Final</span></button>
+        <button class="header-btn" onclick="toggleClassroomMode()" id="classroomBtn"><i class="fa-solid fa-chalkboard-user"></i> <span>Classroom</span></button>
+    </div>
+</header>
+
+<!-- ===== APP CONTAINER ===== -->
+<div class="app-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>SESSION PROGRESS</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-label" style="margin-top:8px;">
+                <span>Topics Completed</span>
+                <span id="topicsCount">0 / 30</span>
+            </div>
+        </div>
+
+        <div class="sidebar-label">Official Syllabus</div>
+        <div class="nav-item syllabus-nav" data-section="syllabus" onclick="goToSyllabus()">
+            <span class="nav-num"><i class="fa-solid fa-book" style="font-size:0.75em;"></i></span> Unit V Syllabus
+        </div>
+
+        <div class="sidebar-label">Overview</div>
+        <div class="nav-item" data-section="0" onclick="goToSection(0)">
+            <span class="nav-num"><i class="fa-solid fa-gauge-high" style="font-size:0.8em;"></i></span> Dashboard
+        </div>
+
+        <div class="sidebar-label">Fundamentals</div>
+        <div class="nav-item" data-section="1" onclick="goToSection(1)"><span class="nav-num">1</span> What Are We Building?</div>
+        <div class="nav-item" data-section="2" onclick="goToSection(2)"><span class="nav-num">2</span> Web Application Basics</div>
+        <div class="nav-item" data-section="3" onclick="goToSection(3)"><span class="nav-num">3</span> What is an API?</div>
+        <div class="nav-item" data-section="4" onclick="goToSection(4)"><span class="nav-num">4</span> What is ASP.NET Core?</div>
+
+        <div class="sidebar-label">Building the Project</div>
+        <div class="nav-item" data-section="5" onclick="goToSection(5)"><span class="nav-num">5</span> Create Project in VS</div>
+        <div class="nav-item" data-section="6" onclick="goToSection(6)"><span class="nav-num">6</span> Project Structure</div>
+        <div class="nav-item" data-section="7" onclick="goToSection(7)"><span class="nav-num">7</span> Program.cs</div>
+        <div class="nav-item" data-section="8" onclick="goToSection(8)"><span class="nav-num">8</span> Model</div>
+        <div class="nav-item" data-section="9" onclick="goToSection(9)"><span class="nav-num">9</span> Controller</div>
+
+        <div class="sidebar-label">CRUD Operations</div>
+        <div class="nav-item" data-section="10" onclick="goToSection(10)"><span class="nav-num">10</span> GET API</div>
+        <div class="nav-item" data-section="11" onclick="goToSection(11)"><span class="nav-num">11</span> POST API</div>
+        <div class="nav-item" data-section="12" onclick="goToSection(12)"><span class="nav-num">12</span> GET by ID</div>
+        <div class="nav-item" data-section="13" onclick="goToSection(13)"><span class="nav-num">13</span> PUT API</div>
+        <div class="nav-item" data-section="14" onclick="goToSection(14)"><span class="nav-num">14</span> DELETE API</div>
+
+        <div class="sidebar-label">REST & Testing</div>
+        <div class="nav-item" data-section="15" onclick="goToSection(15)"><span class="nav-num">15</span> RESTful API</div>
+        <div class="nav-item" data-section="16" onclick="goToSection(16)"><span class="nav-num">16</span> HTTP Status Codes</div>
+        <div class="nav-item" data-section="17" onclick="goToSection(17)"><span class="nav-num">17</span> Swagger Testing</div>
+
+        <div class="sidebar-label">Architecture</div>
+        <div class="nav-item" data-section="18" onclick="goToSection(18)"><span class="nav-num">18</span> Middleware</div>
+        <div class="nav-item" data-section="19" onclick="goToSection(19)"><span class="nav-num">19</span> ASP.NET Core Runtime</div>
+        <div class="nav-item" data-section="20" onclick="goToSection(20)"><span class="nav-num">20</span> Generic Host</div>
+        <div class="nav-item" data-section="21" onclick="goToSection(21)"><span class="nav-num">21</span> Kestrel</div>
+
+        <div class="sidebar-label">Security</div>
+        <div class="nav-item" data-section="22" onclick="goToSection(22)"><span class="nav-num">22</span> Authentication</div>
+        <div class="nav-item" data-section="23" onclick="goToSection(23)"><span class="nav-num">23</span> Authorization</div>
+        <div class="nav-item" data-section="24" onclick="goToSection(24)"><span class="nav-num">24</span> JWT</div>
+        <div class="nav-item" data-section="25" onclick="goToSection(25)"><span class="nav-num">25</span> Protect API with [Authorize]</div>
+
+        <div class="sidebar-label">Complete Picture</div>
+        <div class="nav-item" data-section="26" onclick="goToSection(26)"><span class="nav-num">26</span> Complete Request Flow</div>
+        <div class="nav-item" data-section="27" onclick="goToSection(27)"><span class="nav-num">27</span> Complete Project</div>
+        <div class="nav-item" data-section="28" onclick="goToSection(28)"><span class="nav-num">28</span> Hands-On Exercises</div>
+        <div class="nav-item" data-section="29" onclick="goToSection(29)"><span class="nav-num">29</span> Interview Questions</div>
+        <div class="nav-item" data-section="30" onclick="goToSection(30)"><span class="nav-num">30</span> Final Revision</div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ============================================================ -->
+        <!-- SYLLABUS SECTION -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-syllabus">
+            <div class="section-header">
+                <div class="section-number">Official Syllabus</div>
+                <h1 class="section-title">Unit V — Syllabus Overview</h1>
+                <p class="section-desc">Designing Web API and ASP.NET Core Ecosystem — official course topics mapped to hands-on sessions.</p>
+            </div>
+
+            <!-- Official Syllabus Document -->
+            <div class="syllabus-doc">
+                <div class="syllabus-doc-header">
+                    <div>Unit – V</div>
+                    <div>Designing Web API and ASP.NET Core Ecosystem</div>
+                    <div>10</div>
+                </div>
+                <div class="syllabus-doc-body">
+                    <strong>Designing Web API</strong> – Building a Web API with ASP.NET Core – Designing RESTful Interface – Securing a web API. <strong>ASP.NET Core Runtime Environment</strong> – ASP.NET core host – Embedded HTTP Server – ASP.NET Core middleware.
+                </div>
+            </div>
+
+            <div class="info-box purple">
+                <p><strong>📘 How to read this page:</strong> The official syllabus contains <strong>8 major topics</strong>. Below, each syllabus topic is visually connected to the sessions in this course that teach it. Click any session pill to jump directly to that session.</p>
+            </div>
+
+            <!-- Visual Flow Tree -->
+            <h3><i class="fa-solid fa-sitemap"></i> Syllabus Topic Flow</h3>
+            <p>This diagram shows how the official Unit V syllabus branches into topics, and each topic is covered by one or more sessions in this course.</p>
+
+            <div class="syllabus-flow-tree">
+                <div class="syllabus-root">
+                    UNIT V
+                    <small>Designing Web API and ASP.NET Core Ecosystem (10 Credits)</small>
+                </div>
+                <div class="syllabus-trunk"></div>
+                <div class="syllabus-branches">
+
+                    <!-- Topic 1 -->
+                    <div class="syllabus-topic t1">
+                        <div class="st-num">Topic 1</div>
+                        <div class="st-title">Designing Web API</div>
+                        <div class="st-desc">Foundations of Web APIs, HTTP, and client-server communication.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(1)">S1</span>
+                            <span class="session-pill" onclick="goToSection(2)">S2</span>
+                            <span class="session-pill" onclick="goToSection(3)">S3</span>
+                            <span class="session-pill" onclick="goToSection(4)">S4</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 2 -->
+                    <div class="syllabus-topic t2">
+                        <div class="st-num">Topic 2</div>
+                        <div class="st-title">Building a Web API with ASP.NET Core</div>
+                        <div class="st-desc">Visual Studio project, structure, Program.cs, models, controllers.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(5)">S5</span>
+                            <span class="session-pill" onclick="goToSection(6)">S6</span>
+                            <span class="session-pill" onclick="goToSection(7)">S7</span>
+                            <span class="session-pill" onclick="goToSection(8)">S8</span>
+                            <span class="session-pill" onclick="goToSection(9)">S9</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 3 -->
+                    <div class="syllabus-topic t3">
+                        <div class="st-num">Topic 3</div>
+                        <div class="st-title">Designing RESTful Interface</div>
+                        <div class="st-desc">GET, POST, PUT, DELETE, REST principles, status codes.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(10)">S10</span>
+                            <span class="session-pill" onclick="goToSection(11)">S11</span>
+                            <span class="session-pill" onclick="goToSection(12)">S12</span>
+                            <span class="session-pill" onclick="goToSection(13)">S13</span>
+                            <span class="session-pill" onclick="goToSection(14)">S14</span>
+                            <span class="session-pill" onclick="goToSection(15)">S15</span>
+                            <span class="session-pill" onclick="goToSection(16)">S16</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 4 -->
+                    <div class="syllabus-topic t4">
+                        <div class="st-num">Topic 4</div>
+                        <div class="st-title">Securing a Web API</div>
+                        <div class="st-desc">Authentication, Authorization, JWT tokens, [Authorize] attribute.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(22)">S22</span>
+                            <span class="session-pill" onclick="goToSection(23)">S23</span>
+                            <span class="session-pill" onclick="goToSection(24)">S24</span>
+                            <span class="session-pill" onclick="goToSection(25)">S25</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 5 -->
+                    <div class="syllabus-topic t5">
+                        <div class="st-num">Topic 5</div>
+                        <div class="st-title">ASP.NET Core Runtime Environment</div>
+                        <div class="st-desc">The .NET runtime, CLR, memory management, application lifetime.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(19)">S19</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 6 -->
+                    <div class="syllabus-topic t6">
+                        <div class="st-num">Topic 6</div>
+                        <div class="st-title">ASP.NET Core Host</div>
+                        <div class="st-desc">Generic Host, configuration, logging, dependency injection, lifetime.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(20)">S20</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 7 -->
+                    <div class="syllabus-topic t7">
+                        <div class="st-num">Topic 7</div>
+                        <div class="st-title">Embedded HTTP Server</div>
+                        <div class="st-desc">Kestrel — the cross-platform web server built into ASP.NET Core.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(21)">S21</span>
+                        </div>
+                    </div>
+
+                    <!-- Topic 8 -->
+                    <div class="syllabus-topic t8">
+                        <div class="st-num">Topic 8</div>
+                        <div class="st-title">ASP.NET Core Middleware</div>
+                        <div class="st-desc">Request/response pipeline, ordering, custom middleware.</div>
+                        <div class="st-sessions">
+                            <span class="session-pill" onclick="goToSection(18)">S18</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Supplementary Sessions -->
+            <h3><i class="fa-solid fa-plus-circle"></i> Supplementary Sessions</h3>
+            <p>These sessions support the syllabus topics with testing, practice, and complete picture walkthroughs.</p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-flask"></i> Swagger Testing</div>
+                    <p>Session 17 — Test the API endpoints interactively.</p>
+                    <button class="btn btn-primary" onclick="goToSection(17)">Go to Session 17</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> Complete Request Flow</div>
+                    <p>Session 26 — End-to-end request lifecycle.</p>
+                    <button class="btn btn-primary" onclick="goToSection(26)">Go to Session 26</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-cubes"></i> Complete Project</div>
+                    <p>Session 27 — All files ready to copy.</p>
+                    <button class="btn btn-primary" onclick="goToSection(27)">Go to Session 27</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-dumbbell"></i> Hands-On Exercises</div>
+                    <p>Session 28 — 8 levels of practice.</p>
+                    <button class="btn btn-primary" onclick="goToSection(28)">Go to Session 28</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-comments"></i> Interview Questions</div>
+                    <p>Session 29 — 18 beginner-friendly Q&A.</p>
+                    <button class="btn btn-primary" onclick="goToSection(29)">Go to Session 29</button>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-book"></i> Final Revision</div>
+                    <p>Session 30 — Cheat sheet and final flow.</p>
+                    <button class="btn btn-primary" onclick="goToSection(30)">Go to Session 30</button>
+                </div>
+            </div>
+
+            <!-- Mapping Table -->
+            <h3><i class="fa-solid fa-table"></i> Syllabus → Session Mapping Table</h3>
+            <table class="syllabus-map-table">
+                <thead>
+                    <tr>
+                        <th style="width:60px;">#</th>
+                        <th>Syllabus Topic</th>
+                        <th>Covered In Sessions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td class="topic-cell">Designing Web API</td>
+                        <td>Sessions 1, 2, 3, 4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td class="topic-cell">Building a Web API with ASP.NET Core</td>
+                        <td>Sessions 5, 6, 7, 8, 9</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td class="topic-cell">Designing RESTful Interface</td>
+                        <td>Sessions 10, 11, 12, 13, 14, 15, 16</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td class="topic-cell">Securing a Web API</td>
+                        <td>Sessions 22, 23, 24, 25</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td class="topic-cell">ASP.NET Core Runtime Environment</td>
+                        <td>Session 19</td>
+                    </tr>
+                    <tr>
+                        <td><strong>6</strong></td>
+                        <td class="topic-cell">ASP.NET Core Host</td>
+                        <td>Session 20</td>
+                    </tr>
+                    <tr>
+                        <td><strong>7</strong></td>
+                        <td class="topic-cell">Embedded HTTP Server</td>
+                        <td>Session 21</td>
+                    </tr>
+                    <tr>
+                        <td><strong>8</strong></td>
+                        <td class="topic-cell">ASP.NET Core Middleware</td>
+                        <td>Session 18</td>
+                    </tr>
+                    <tr>
+                        <td><strong>+</strong></td>
+                        <td class="topic-cell" style="color:var(--text-muted);font-style:italic;">Supplementary (Testing, Practice, Revision)</td>
+                        <td>Sessions 17, 26, 27, 28, 29, 30</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box green">
+                <p><strong>✅ Coverage:</strong> Every topic in the official Unit V syllabus is covered by at least one session in this course, with additional sessions dedicated to hands-on practice, testing, and revision.</p>
+            </div>
+
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(0)"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
+                <button class="btn btn-primary" onclick="goToSection(1)">Start Session 1 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 0: DASHBOARD -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-0">
+            <div class="section-header">
+                <div class="section-number">Dashboard</div>
+                <h1 class="section-title">Session Dashboard</h1>
+                <p class="section-desc">All 30 sessions in Unit V — click any card to jump to that session.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>📊 Total Sessions:</strong> <span id="totalSessionsDisplay">30</span> &nbsp;|&nbsp; <strong>Completed:</strong> <span id="completedSessionsDisplay">0</span> / 30</p>
+            </div>
+            <div class="dashboard-grid" id="dashboardGrid"></div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSyllabus()"><i class="fa-solid fa-book"></i> Syllabus</button>
+                <button class="btn btn-primary" onclick="goToSection(1)">Start Session 1 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 1 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-1">
+            <div class="section-header">
+                <div class="section-number">Section 01</div>
+                <h1 class="section-title">What Are We Building?</h1>
+                <p class="section-desc">Introducing the Product Management Web API — the single application we'll build throughout Unit V.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>🎯 Our Goal:</strong> Build a complete REST API called <strong>ProductApi</strong> that manages products.</p>
+            </div>
+            <h3><i class="fa-solid fa-cube"></i> The Application: Product Management API</h3>
+            <p>We are building a <strong>Web API</strong> that allows any client (web app, mobile app, Postman, Swagger) to manage a list of products.</p>
+            <div class="grid-4">
+                <div class="crud-card create" onclick="goToSection(11)">
+                    <div class="icon"><i class="fa-solid fa-plus-circle"></i></div>
+                    <div class="label">CREATE</div>
+                    <div class="method">POST</div>
+                </div>
+                <div class="crud-card read" onclick="goToSection(10)">
+                    <div class="icon"><i class="fa-solid fa-eye"></i></div>
+                    <div class="label">READ</div>
+                    <div class="method">GET</div>
+                </div>
+                <div class="crud-card update" onclick="goToSection(13)">
+                    <div class="icon"><i class="fa-solid fa-pen-to-square"></i></div>
+                    <div class="label">UPDATE</div>
+                    <div class="method">PUT</div>
+                </div>
+                <div class="crud-card delete" onclick="goToSection(14)">
+                    <div class="icon"><i class="fa-solid fa-trash-can"></i></div>
+                    <div class="label">DELETE</div>
+                    <div class="method">DELETE</div>
+                </div>
+            </div>
+            <div class="info-box green">
+                <p><strong>💡 Memory Trick:</strong> CRUD = Create, Read, Update, Delete → POST, GET, PUT, DELETE.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(0)"><i class="fa-solid fa-arrow-left"></i> Dashboard</button>
+                <button class="btn btn-primary" onclick="goToSection(2)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 2 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-2">
+            <div class="section-header">
+                <div class="section-number">Section 02</div>
+                <h1 class="section-title">Web Application Basics</h1>
+                <p class="section-desc">Before writing code, let's understand how web applications work.</p>
+            </div>
+            <h3><i class="fa-solid fa-users"></i> The Big Picture</h3>
+            <div class="flow-diagram">
+                <div class="flow-node highlight-blue">USER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">FRONTEND</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">WEB API</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">BACKEND</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">DATABASE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">RESPONSE</div>
+            </div>
+            <h3><i class="fa-solid fa-utensils"></i> Real-Life Analogy: The Restaurant</h3>
+            <div class="flow-diagram">
+                <div class="flow-node">CUSTOMER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">WAITER (API)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">KITCHEN (Backend)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">FOOD (Response)</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(1)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(3)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 3 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-3">
+            <div class="section-header">
+                <div class="section-number">Section 03</div>
+                <h1 class="section-title">What is an API?</h1>
+                <p class="section-desc">API stands for Application Programming Interface.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>Simple Definition:</strong> An API is a set of rules that allows two applications to talk to each other.</p>
+            </div>
+            <h3><i class="fa-solid fa-arrow-right-arrow-left"></i> How a Web API Works</h3>
+            <div class="flow-diagram">
+                <div class="flow-node">CLIENT</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">HTTP REQUEST</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">WEB API</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">HTTP RESPONSE (JSON)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node">CLIENT displays data</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(2)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(4)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 4 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-4">
+            <div class="section-header">
+                <div class="section-number">Section 04</div>
+                <h1 class="section-title">What is ASP.NET Core?</h1>
+                <p class="section-desc">ASP.NET Core is the framework we'll use to build our Web API.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>Simple Definition:</strong> ASP.NET Core is a free, open-source, cross-platform framework by Microsoft for building modern web applications and APIs using C#.</p>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-cross-platform"></i> Cross-Platform</div>
+                    <p>Runs on Windows, Linux, and macOS.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-bolt"></i> High Performance</div>
+                    <p>One of the fastest web frameworks available.</p>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(3)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(5)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 5 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-5">
+            <div class="section-header">
+                <div class="section-number">Section 05</div>
+                <h1 class="section-title">Create Project in Visual Studio</h1>
+                <p class="section-desc">Step-by-step guide to creating your ProductApi project.</p>
+            </div>
+            <div class="info-box green">
+                <p><strong>🎯 What you'll do:</strong> Create a new ASP.NET Core Web API project named <strong>ProductApi</strong>.</p>
+            </div>
+            <div class="expandable open">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 1: Open Visual Studio</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Launch Visual Studio.</p>
+                    <p><strong>WHY:</strong> This is where we'll write, build, and run our C# code.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 2: Click "Create a new project"</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Click "Create a new project".</p>
+                    <p><strong>WHY:</strong> We're starting a brand new project from scratch.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 3: Select "ASP.NET Core Web API"</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Search "web api" and select "ASP.NET Core Web API".</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 4: Name it "ProductApi"</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Type "ProductApi" and click Next.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 5: Choose Framework & Options</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Select the latest .NET version, enable OpenAPI support, click Create.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>Step 6: Run the Application</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p><strong>ACTION:</strong> Click the green Start button (or press F5).</p>
+                </div>
+            </div>
+            <h3><i class="fa-solid fa-terminal"></i> Alternative: Using the .NET CLI</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Terminal — CLI Commands</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('cli-create')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="cli-create" class="language-bash">dotnet new webapi -n ProductApi
+cd ProductApi
+dotnet run</code></pre>
+            </div>
+            <div class="info-box yellow">
+                <p><strong>⚠️ Important:</strong> Port numbers in console output are examples only. Your actual ports will differ.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(4)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(6)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 6 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-6">
+            <div class="section-header">
+                <div class="section-number">Section 06</div>
+                <h1 class="section-title">Project Structure</h1>
+                <p class="section-desc">Understanding the files and folders created by Visual Studio.</p>
+            </div>
+            <div class="project-tree">
+                <div><span class="folder">ProductApi/</span></div>
+                <div>├── <span class="folder">Controllers/</span></div>
+                <div>│   └── <span class="cs-file">ProductsController.cs</span></div>
+                <div>├── <span class="folder">Models/</span></div>
+                <div>│   └── <span class="cs-file">Product.cs</span></div>
+                <div>├── <span class="cs-file">Program.cs</span></div>
+                <div>├── <span class="json-file">appsettings.json</span></div>
+                <div>└── <span class="cs-file">ProductApi.csproj</span></div>
+            </div>
+            <div class="expandable open">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>📄 Program.cs — The Entry Point</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p>Where the application starts. Configures services, builds the pipeline, and starts the web server.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>📁 Controllers/ — Request Handlers</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p>Classes that handle incoming HTTP requests. Each controller manages one resource.</p>
+                </div>
+            </div>
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleExpandable(this)">
+                    <span>📁 Models/ — Data Shapes</span>
+                    <span class="arrow">▶</span>
+                </div>
+                <div class="expandable-body">
+                    <p>C# classes that define the shape of your data.</p>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(5)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(7)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 7 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-7">
+            <div class="section-header">
+                <div class="section-number">Section 07</div>
+                <h1 class="section-title">Program.cs</h1>
+                <p class="section-desc">The entry point of every ASP.NET Core application.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Program.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('program-cs')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="program-cs" class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node highlight-blue">CREATE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">CONFIGURE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">BUILD</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">PIPELINE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">RUN</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(6)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(8)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 8 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-8">
+            <div class="section-header">
+                <div class="section-number">Section 08</div>
+                <h1 class="section-title">Model</h1>
+                <p class="section-desc">Creating the Product model — the blueprint for our data.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Models/Product.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('product-model')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="product-model" class="language-csharp">namespace ProductApi.Models;
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+}</code></pre>
+            </div>
+            <div class="info-box green">
+                <p><strong>💡 Analogy:</strong> A model is like a form with fields for Id, Name, and Price.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(7)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(9)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 9 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-9">
+            <div class="section-header">
+                <div class="section-number">Section 09</div>
+                <h1 class="section-title">Controller</h1>
+                <p class="section-desc">Creating the ProductsController — the heart of our API.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Controllers/ProductsController.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('controller-code')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="controller-code" class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using ProductApi.Models;
+
+namespace ProductApi.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private static readonly List&lt;Product&gt; Products = new()
+    {
+        new Product { Id = 1, Name = "Laptop", Price = 50000 },
+        new Product { Id = 2, Name = "Mouse", Price = 1000 }
+    };
+
+    [HttpGet]
+    public IActionResult GetAll() => Ok(Products);
+
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var product = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (product == null) return NotFound();
+        return Ok(product);
+    }
+
+    [HttpPost]
+    public IActionResult Create(Product product)
+    {
+        product.Id = Products.Count + 1;
+        Products.Add(product);
+        return Created("", product);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, Product product)
+    {
+        var existing = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (existing == null) return NotFound();
+        existing.Name = product.Name;
+        existing.Price = product.Price;
+        return Ok(existing);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var product = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (product == null) return NotFound();
+        Products.Remove(product);
+        return NoContent();
+    }
+}</code></pre>
+            </div>
+            <div class="info-box yellow">
+                <p><strong>⚠️ Important:</strong> The in-memory list is only for learning. In production, use a database with Entity Framework Core.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(8)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(10)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 10 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-10">
+            <div class="section-header">
+                <div class="section-number">Section 10</div>
+                <h1 class="section-title">GET API</h1>
+                <p class="section-desc">Reading data — the most common API operation.</p>
+            </div>
+            <div class="info-box green">
+                <p><strong>GET means READ.</strong> Never modifies data — only reads it.</p>
+            </div>
+            <div class="sim-panel">
+                <span class="sim-badge">Interactive Simulation</span>
+                <p>Simulate a GET request.</p>
+                <button class="btn btn-primary" onclick="simulateGet()"><i class="fa-solid fa-play"></i> Send GET Request</button>
+                <div class="sim-output" id="get-sim-output" style="margin-top:12px;">// Click "Send GET Request"...</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(9)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(11)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 11 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-11">
+            <div class="section-header">
+                <div class="section-number">Section 11</div>
+                <h1 class="section-title">POST API</h1>
+                <p class="section-desc">Creating new data — adding products to our collection.</p>
+            </div>
+            <div class="info-box green">
+                <p><strong>POST means CREATE.</strong> Sends data in the request body.</p>
+            </div>
+            <div class="sim-panel">
+                <span class="sim-badge">Interactive Simulation</span>
+                <input type="text" class="sim-input" id="post-name" placeholder="Product name" value="Keyboard">
+                <input type="number" class="sim-input" id="post-price" placeholder="Price" value="1500">
+                <button class="btn btn-success" onclick="simulatePost()"><i class="fa-solid fa-plus"></i> Send POST Request</button>
+                <div class="sim-output" id="post-sim-output" style="margin-top:12px;">// Fill fields and click...</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(10)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(12)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 12 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-12">
+            <div class="section-header">
+                <div class="section-number">Section 12</div>
+                <h1 class="section-title">GET by ID</h1>
+                <p class="section-desc">Retrieving a specific product by its unique identifier.</p>
+            </div>
+            <div class="sim-panel">
+                <span class="sim-badge">Interactive Simulation</span>
+                <input type="number" class="sim-input" id="getbyid-input" placeholder="Product ID" value="1">
+                <button class="btn btn-primary" onclick="simulateGetById()"><i class="fa-solid fa-magnifying-glass"></i> Send GET Request</button>
+                <div class="sim-output" id="getbyid-sim-output" style="margin-top:12px;">// Enter ID and click...</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(11)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(13)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 13 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-13">
+            <div class="section-header">
+                <div class="section-number">Section 13</div>
+                <h1 class="section-title">PUT API</h1>
+                <p class="section-desc">Updating existing data — modifying product details.</p>
+            </div>
+            <div class="sim-panel">
+                <span class="sim-badge">Interactive Simulation</span>
+                <input type="number" class="sim-input" id="put-id" placeholder="Product ID" value="1">
+                <input type="text" class="sim-input" id="put-name" placeholder="New name" value="Gaming Laptop">
+                <input type="number" class="sim-input" id="put-price" placeholder="New price" value="75000">
+                <button class="btn btn-warning" onclick="simulatePut()"><i class="fa-solid fa-pen"></i> Send PUT Request</button>
+                <div class="sim-output" id="put-sim-output" style="margin-top:12px;">// Fill fields and click...</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(12)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(14)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 14 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-14">
+            <div class="section-header">
+                <div class="section-number">Section 14</div>
+                <h1 class="section-title">DELETE API</h1>
+                <p class="section-desc">Removing data — deleting products from the collection.</p>
+            </div>
+            <div class="sim-panel">
+                <span class="sim-badge">Interactive Simulation</span>
+                <input type="number" class="sim-input" id="delete-id" placeholder="Product ID" value="1">
+                <button class="btn btn-danger" onclick="simulateDelete()"><i class="fa-solid fa-trash"></i> Send DELETE Request</button>
+                <div class="sim-output" id="delete-sim-output" style="margin-top:12px;">// Enter ID and click...</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(13)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(15)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 15 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-15">
+            <div class="section-header">
+                <div class="section-number">Section 15</div>
+                <h1 class="section-title">RESTful API</h1>
+                <p class="section-desc">Understanding the design style behind our API.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>REST</strong> = Representational State Transfer. A set of rules for designing APIs.</p>
+            </div>
+            <table class="endpoint-table">
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="method-tag get">GET</span></td><td>/api/products</td><td>Read All</td></tr>
+                    <tr><td><span class="method-tag get">GET</span></td><td>/api/products/1</td><td>Read One</td></tr>
+                    <tr><td><span class="method-tag post">POST</span></td><td>/api/products</td><td>Create</td></tr>
+                    <tr><td><span class="method-tag put">PUT</span></td><td>/api/products/1</td><td>Update</td></tr>
+                    <tr><td><span class="method-tag delete">DELETE</span></td><td>/api/products/1</td><td>Delete</td></tr>
+                </tbody>
+            </table>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(14)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(16)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 16 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-16">
+            <div class="section-header">
+                <div class="section-number">Section 16</div>
+                <h1 class="section-title">HTTP Status Codes</h1>
+                <p class="section-desc">What the server tells the client with each response.</p>
+            </div>
+            <div class="grid-2">
+                <div class="status-card s2xx" onclick="toggleStatus(this)">
+                    <div class="status-code">200 OK</div>
+                    <div class="status-name">Success</div>
+                    <div class="status-desc">Request succeeded.</div>
+                    <div class="status-extra" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.8em;">
+                        <p>Used for successful GET, PUT requests.</p>
+                    </div>
+                </div>
+                <div class="status-card s2xx" onclick="toggleStatus(this)">
+                    <div class="status-code">201 Created</div>
+                    <div class="status-name">Resource Created</div>
+                    <div class="status-desc">New resource created.</div>
+                    <div class="status-extra" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.8em;">
+                        <p>Used after successful POST.</p>
+                    </div>
+                </div>
+                <div class="status-card s2xx" onclick="toggleStatus(this)">
+                    <div class="status-code">204 No Content</div>
+                    <div class="status-name">Success, No Body</div>
+                    <div class="status-desc">Succeeded, nothing to return.</div>
+                    <div class="status-extra" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.8em;">
+                        <p>Used after successful DELETE.</p>
+                    </div>
+                </div>
+                <div class="status-card s4xx" onclick="toggleStatus(this)">
+                    <div class="status-code">400 Bad Request</div>
+                    <div class="status-name">Invalid Request</div>
+                    <div class="status-desc">Malformed request.</div>
+                </div>
+                <div class="status-card s4xx" onclick="toggleStatus(this)">
+                    <div class="status-code">401 Unauthorized</div>
+                    <div class="status-name">Not Authenticated</div>
+                    <div class="status-desc">Log in required.</div>
+                </div>
+                <div class="status-card s4xx" onclick="toggleStatus(this)">
+                    <div class="status-code">403 Forbidden</div>
+                    <div class="status-name">Not Authorized</div>
+                    <div class="status-desc">No permission.</div>
+                </div>
+                <div class="status-card s4xx" onclick="toggleStatus(this)">
+                    <div class="status-code">404 Not Found</div>
+                    <div class="status-name">Resource Missing</div>
+                    <div class="status-desc">Resource doesn't exist.</div>
+                </div>
+                <div class="status-card s5xx" onclick="toggleStatus(this)">
+                    <div class="status-code">500 Internal Server Error</div>
+                    <div class="status-name">Server Bug</div>
+                    <div class="status-desc">Unexpected server error.</div>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(15)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(17)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 17 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-17">
+            <div class="section-header">
+                <div class="section-number">Section 17</div>
+                <h1 class="section-title">Swagger Testing</h1>
+                <p class="section-desc">Testing your API without writing any client code.</p>
+            </div>
+            <div class="info-box blue">
+                <p><strong>Swagger/OpenAPI</strong> gives us a browser-based interface for testing our API.</p>
+            </div>
+            <div class="swagger-ui">
+                <div class="swagger-topbar">
+                    <div class="swagger-logo">Swagger UI</div>
+                    <div class="swagger-url">/swagger/v1/swagger.json</div>
+                </div>
+                <div style="padding:16px 20px;">
+                    <h3 style="color:#3b4151;margin:0 0 4px;font-size:1.1em;">ProductApi</h3>
+                    <p style="color:#999;font-size:0.8em;margin:0;">v1</p>
+                </div>
+                <div class="swagger-endpoint">
+                    <div class="swagger-endpoint-header" onclick="toggleSwagger(this)">
+                        <span class="swagger-method get">GET</span>
+                        <span class="swagger-path">/api/products</span>
+                        <span class="swagger-desc">Get all products</span>
+                    </div>
+                    <div class="swagger-body">
+                        <button class="btn btn-primary" style="margin-bottom:10px;" onclick="simulateSwagger('get')">Try it out</button>
+                        <div class="swagger-response" id="swagger-get-response">// Click "Try it out"</div>
+                    </div>
+                </div>
+                <div class="swagger-endpoint">
+                    <div class="swagger-endpoint-header" onclick="toggleSwagger(this)">
+                        <span class="swagger-method post">POST</span>
+                        <span class="swagger-path">/api/products</span>
+                        <span class="swagger-desc">Add a new product</span>
+                    </div>
+                    <div class="swagger-body">
+                        <button class="btn btn-success" style="margin-bottom:10px;" onclick="simulateSwagger('post')">Try it out</button>
+                        <div class="swagger-response" id="swagger-post-response">// Click "Try it out"</div>
+                    </div>
+                </div>
+                <div class="swagger-endpoint">
+                    <div class="swagger-endpoint-header" onclick="toggleSwagger(this)">
+                        <span class="swagger-method put">PUT</span>
+                        <span class="swagger-path">/api/products/{id}</span>
+                        <span class="swagger-desc">Update a product</span>
+                    </div>
+                    <div class="swagger-body">
+                        <button class="btn btn-warning" style="margin-bottom:10px;" onclick="simulateSwagger('put')">Try it out</button>
+                        <div class="swagger-response" id="swagger-put-response">// Click "Try it out"</div>
+                    </div>
+                </div>
+                <div class="swagger-endpoint">
+                    <div class="swagger-endpoint-header" onclick="toggleSwagger(this)">
+                        <span class="swagger-method delete">DELETE</span>
+                        <span class="swagger-path">/api/products/{id}</span>
+                        <span class="swagger-desc">Delete a product</span>
+                    </div>
+                    <div class="swagger-body">
+                        <button class="btn btn-danger" style="margin-bottom:10px;" onclick="simulateSwagger('delete')">Try it out</button>
+                        <div class="swagger-response" id="swagger-delete-response">// Click "Try it out"</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-box yellow">
+                <p><strong>⚠️ Note:</strong> This Swagger UI is a <strong>simulation</strong>. Real Swagger runs when you launch ProductApi in Visual Studio and visit <code>/swagger</code>.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(16)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(18)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 18 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-18">
+            <div class="section-header">
+                <div class="section-number">Section 18</div>
+                <h1 class="section-title">Middleware</h1>
+                <p class="section-desc">The request/response pipeline.</p>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node highlight-cyan">REQUEST</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">Middleware 1</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">Middleware 2</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">CONTROLLER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node">RESPONSE</div>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Program.cs — Full Pipeline</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('middleware-full')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="middleware-full" class="language-csharp">var app = builder.Build();
+
+// ORDER IS CRITICAL!
+app.UseExceptionHandler("/Error");
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(17)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(19)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 19 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-19">
+            <div class="section-header">
+                <div class="section-number">Section 19</div>
+                <h1 class="section-title">ASP.NET Core Runtime</h1>
+                <p class="section-desc">The environment that runs your application.</p>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node highlight-cyan">C# Code</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">.NET Runtime (CLR)</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">ASP.NET Core</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">Your Application</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(18)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(20)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 20 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-20">
+            <div class="section-header">
+                <div class="section-number">Section 20</div>
+                <h1 class="section-title">Generic Host</h1>
+                <p class="section-desc">The manager of your application.</p>
+            </div>
+            <div class="project-tree" style="text-align:center;font-size:0.9em;">
+                <div><span class="folder">Host</span></div>
+                <div>├── Configuration</div>
+                <div>├── Logging</div>
+                <div>├── Dependency Injection</div>
+                <div>├── Application Lifetime</div>
+                <div>└── Server (Kestrel)</div>
+            </div>
+            <div class="info-box purple">
+                <p><strong>The Host is like a manager of a company.</strong> It sets up everything and keeps the app running.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(19)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(21)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 21 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-21">
+            <div class="section-header">
+                <div class="section-number">Section 21</div>
+                <h1 class="section-title">Kestrel</h1>
+                <p class="section-desc">The embedded HTTP server.</p>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node">Browser</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">HTTPS Request</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">Kestrel</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">ASP.NET Core Runtime</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">Middleware</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-red">Controller</div>
+            </div>
+            <div class="info-box purple">
+                <p><strong>Kestrel is like the reception desk of a building.</strong> Every request first arrives here, then gets directed to the right place.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(20)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(22)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 22 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-22">
+            <div class="section-header">
+                <div class="section-number">Section 22</div>
+                <h1 class="section-title">Authentication</h1>
+                <p class="section-desc">"Who are you?" — Verifying identity.</p>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node">User</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">Login</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">Verify credentials</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">Identity verified ✓</div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(21)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(23)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 23 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-23">
+            <div class="section-header">
+                <div class="section-number">Section 23</div>
+                <h1 class="section-title">Authorization</h1>
+                <p class="section-desc">"What are you allowed to do?"</p>
+            </div>
+            <div class="grid-2">
+                <div class="card" style="border-left:4px solid var(--accent);">
+                    <div class="card-title">Authentication</div>
+                    <p><strong>Question:</strong> WHO are you?</p>
+                    <p><strong>Result:</strong> 401 if it fails.</p>
+                </div>
+                <div class="card" style="border-left:4px solid var(--warning);">
+                    <div class="card-title">Authorization</div>
+                    <p><strong>Question:</strong> WHAT can you do?</p>
+                    <p><strong>Result:</strong> 403 if it fails.</p>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(22)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(24)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 24 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-24">
+            <div class="section-header">
+                <div class="section-number">Section 24</div>
+                <h1 class="section-title">JWT</h1>
+                <p class="section-desc">JSON Web Tokens — the ID card for your API.</p>
+            </div>
+            <div class="info-box purple">
+                <p><strong>A JWT is like a college ID card.</strong> The server issues it at login; the client shows it with every request.</p>
+            </div>
+            <div class="flow-diagram">
+                <div class="flow-node">Login</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">Server verifies</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">JWT Token generated</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">Client sends: Bearer TOKEN</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">Server validates</div>
+            </div>
+            <div class="info-box yellow">
+                <p><strong>⚠️ Security:</strong> Never hardcode secrets. Store JWT keys in configuration or environment variables.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(23)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(25)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 25 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-25">
+            <div class="section-header">
+                <div class="section-number">Section 25</div>
+                <h1 class="section-title">Protect API with [Authorize]</h1>
+                <p class="section-desc">Restricting access to specific endpoints.</p>
+            </div>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>ProductsController.cs — Protected Delete</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('authorize-code')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="authorize-code" class="language-csharp">[Authorize]
+[HttpDelete("{id}")]
+public IActionResult Delete(int id)
+{
+    var product = Products.FirstOrDefault(x =&gt; x.Id == id);
+    if (product == null)
+        return NotFound();
+    Products.Remove(product);
+    return NoContent();
+}</code></pre>
+            </div>
+            <div class="grid-2">
+                <div class="card" style="border-left:3px solid var(--danger);">
+                    <div class="card-title text-danger">Without Auth</div>
+                    <p>401 Unauthorized</p>
+                </div>
+                <div class="card" style="border-left:3px solid var(--success);">
+                    <div class="card-title text-success">With Valid Auth</div>
+                    <p>204 No Content</p>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(24)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(26)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 26 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-26">
+            <div class="section-header">
+                <div class="section-number">Section 26</div>
+                <h1 class="section-title">Complete Request Flow</h1>
+                <p class="section-desc">The biggest picture — end-to-end request journey.</p>
+            </div>
+            <p>Click any block to see a short explanation.</p>
+            <div class="final-flow">
+                <div class="flow-node clickable" onclick="showFlowInfo('user')">USER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-blue" onclick="showFlowInfo('browser')">BROWSER / FRONTEND</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-cyan" onclick="showFlowInfo('http')">HTTP REQUEST</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-purple" onclick="showFlowInfo('kestrel')">KESTREL</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-yellow" onclick="showFlowInfo('runtime')">ASP.NET CORE RUNTIME</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-blue" onclick="showFlowInfo('middleware')">MIDDLEWARE PIPELINE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-purple" onclick="showFlowInfo('authn')">AUTHENTICATION</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-yellow" onclick="showFlowInfo('authz')">AUTHORIZATION</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-green" onclick="showFlowInfo('routing')">ROUTING</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-red" onclick="showFlowInfo('controller')">CONTROLLER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-green" onclick="showFlowInfo('logic')">BUSINESS LOGIC</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-yellow" onclick="showFlowInfo('data')">DATA</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-cyan" onclick="showFlowInfo('response')">HTTP RESPONSE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable highlight-blue" onclick="showFlowInfo('json')">JSON</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable" onclick="showFlowInfo('frontend2')">FRONTEND</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node clickable" onclick="showFlowInfo('user2')">USER</div>
+            </div>
+            <div id="flow-info-panel" class="info-box cyan" style="display:none;">
+                <p id="flow-info-text">Click a block above.</p>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(25)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(27)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 27 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-27">
+            <div class="section-header">
+                <div class="section-number">Section 27</div>
+                <h1 class="section-title">Complete Project</h1>
+                <p class="section-desc">All the files you need — ready to copy into Visual Studio.</p>
+            </div>
+            <div class="project-tree">
+                <div><span class="folder">ProductApi/</span></div>
+                <div>├── <span class="folder">Controllers/</span></div>
+                <div>│   └── <span class="cs-file">ProductsController.cs</span></div>
+                <div>├── <span class="folder">Models/</span></div>
+                <div>│   └── <span class="cs-file">Product.cs</span></div>
+                <div>├── <span class="cs-file">Program.cs</span></div>
+                <div>├── <span class="json-file">appsettings.json</span></div>
+                <div>└── <span class="cs-file">ProductApi.csproj</span></div>
+            </div>
+            <h3><i class="fa-solid fa-file-code"></i> Models/Product.cs</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Models/Product.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('final-product')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="final-product" class="language-csharp">namespace ProductApi.Models;
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+}</code></pre>
+            </div>
+            <h3><i class="fa-solid fa-file-code"></i> Controllers/ProductsController.cs</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Controllers/ProductsController.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('final-controller')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="final-controller" class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using ProductApi.Models;
+
+namespace ProductApi.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private static readonly List&lt;Product&gt; Products = new()
+    {
+        new Product { Id = 1, Name = "Laptop", Price = 50000 },
+        new Product { Id = 2, Name = "Mouse", Price = 1000 }
+    };
+
+    [HttpGet]
+    public IActionResult GetAll() => Ok(Products);
+
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var product = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (product == null) return NotFound();
+        return Ok(product);
+    }
+
+    [HttpPost]
+    public IActionResult Create(Product product)
+    {
+        product.Id = Products.Count + 1;
+        Products.Add(product);
+        return Created("", product);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, Product product)
+    {
+        var existing = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (existing == null) return NotFound();
+        existing.Name = product.Name;
+        existing.Price = product.Price;
+        return Ok(existing);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var product = Products.FirstOrDefault(x =&gt; x.Id == id);
+        if (product == null) return NotFound();
+        Products.Remove(product);
+        return NoContent();
+    }
+}</code></pre>
+            </div>
+            <h3><i class="fa-solid fa-file-code"></i> Program.cs</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span>Program.cs</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn" onclick="copyCode('final-program')"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <pre><code id="final-program" class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(26)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(28)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 28 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-28">
+            <div class="section-header">
+                <div class="section-number">Section 28</div>
+                <h1 class="section-title">Hands-On Exercises</h1>
+                <p class="section-desc">Practice what you've learned — from Level 1 to Level 8.</p>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l1">Level 1</span>
+                    <span class="exercise-title">Create Product Model</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Create a <code>Product</code> class with Id, Name, Price.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-1')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-1" style="margin-top:10px;">
+                        <div>namespace ProductApi.Models;</div>
+                        <div><br>public class Product</div>
+                        <div>{</div>
+                        <div>&nbsp;&nbsp;public int Id { get; set; }</div>
+                        <div>&nbsp;&nbsp;public string Name { get; set; } = string.Empty;</div>
+                        <div>&nbsp;&nbsp;public decimal Price { get; set; }</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l2">Level 2</span>
+                    <span class="exercise-title">Create GET Endpoint</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Add a GET endpoint returning all products.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-2')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-2" style="margin-top:10px;">
+                        <div>[HttpGet]</div>
+                        <div>public IActionResult GetAll() =&gt; Ok(Products);</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l3">Level 3</span>
+                    <span class="exercise-title">Create POST Endpoint</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Add a POST endpoint to create a product.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-3')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-3" style="margin-top:10px;">
+                        <div>[HttpPost]</div>
+                        <div>public IActionResult Create(Product product)</div>
+                        <div>{</div>
+                        <div>&nbsp;&nbsp;product.Id = Products.Count + 1;</div>
+                        <div>&nbsp;&nbsp;Products.Add(product);</div>
+                        <div>&nbsp;&nbsp;return Created("", product);</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l4">Level 4</span>
+                    <span class="exercise-title">Create PUT Endpoint</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Add a PUT endpoint to update a product.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-4')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-4" style="margin-top:10px;">
+                        <div>[HttpPut("{id}")]</div>
+                        <div>public IActionResult Update(int id, Product product)</div>
+                        <div>{</div>
+                        <div>&nbsp;&nbsp;var existing = Products.FirstOrDefault(x =&gt; x.Id == id);</div>
+                        <div>&nbsp;&nbsp;if (existing == null) return NotFound();</div>
+                        <div>&nbsp;&nbsp;existing.Name = product.Name;</div>
+                        <div>&nbsp;&nbsp;existing.Price = product.Price;</div>
+                        <div>&nbsp;&nbsp;return Ok(existing);</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l5">Level 5</span>
+                    <span class="exercise-title">Create DELETE Endpoint</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Add a DELETE endpoint to remove a product.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-5')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-5" style="margin-top:10px;">
+                        <div>[HttpDelete("{id}")]</div>
+                        <div>public IActionResult Delete(int id)</div>
+                        <div>{</div>
+                        <div>&nbsp;&nbsp;var product = Products.FirstOrDefault(x =&gt; x.Id == id);</div>
+                        <div>&nbsp;&nbsp;if (product == null) return NotFound();</div>
+                        <div>&nbsp;&nbsp;Products.Remove(product);</div>
+                        <div>&nbsp;&nbsp;return NoContent();</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l6">Level 6</span>
+                    <span class="exercise-title">Add Middleware</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Create custom middleware to log request timings.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-6')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-6" style="margin-top:10px;">
+                        <div>public class RequestTimingMiddleware</div>
+                        <div>{</div>
+                        <div>&nbsp;&nbsp;private readonly RequestDelegate _next;</div>
+                        <div>&nbsp;&nbsp;private readonly ILogger&lt;RequestTimingMiddleware&gt; _logger;</div>
+                        <div><br>&nbsp;&nbsp;public RequestTimingMiddleware(RequestDelegate next, ILogger&lt;RequestTimingMiddleware&gt; logger)</div>
+                        <div>&nbsp;&nbsp;{ _next = next; _logger = logger; }</div>
+                        <div><br>&nbsp;&nbsp;public async Task InvokeAsync(HttpContext context)</div>
+                        <div>&nbsp;&nbsp;{</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;var sw = Stopwatch.StartNew();</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;await _next(context);</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;sw.Stop();</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;_logger.LogInformation($"Request {context.Request.Path} took {sw.ElapsedMilliseconds} ms");</div>
+                        <div>&nbsp;&nbsp;}</div>
+                        <div>}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l7">Level 7</span>
+                    <span class="exercise-title">Add JWT Authentication</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Configure JWT authentication in Program.cs.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-7')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-7" style="margin-top:10px;">
+                        <div>builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)</div>
+                        <div>&nbsp;&nbsp;.AddJwtBearer(options =&gt;</div>
+                        <div>&nbsp;&nbsp;{</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;options.TokenValidationParameters = new TokenValidationParameters</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;{</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidateIssuer = true,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidateAudience = true,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidateLifetime = true,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidateIssuerSigningKey = true,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidIssuer = builder.Configuration["Jwt:Issuer"],</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ValidAudience = builder.Configuration["Jwt:Audience"],</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IssuerSigningKey = new SymmetricSecurityKey(</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;};</div>
+                        <div>&nbsp;&nbsp;});</div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-level l8">Level 8</span>
+                    <span class="exercise-title">Protect DELETE Endpoint</span>
+                </div>
+                <div class="exercise-body">
+                    <p><strong>Task:</strong> Add <code>[Authorize]</code> to the DELETE endpoint.</p>
+                    <button class="btn btn-outline" onclick="toggleSolution('sol-8')"><i class="fa-solid fa-eye"></i> Show Solution</button>
+                    <div class="output-panel" id="sol-8" style="margin-top:10px;">
+                        <div>[Authorize]</div>
+                        <div>[HttpDelete("{id}")]</div>
+                        <div>public IActionResult Delete(int id) { ... }</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(27)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(29)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 29 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-29">
+            <div class="section-header">
+                <div class="section-number">Section 29</div>
+                <h1 class="section-title">Interview Questions</h1>
+                <p class="section-desc">Beginner-friendly questions — click to reveal answers.</p>
+            </div>
+            <div id="interview-list"></div>
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(28)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSection(30)">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 30 -->
+        <!-- ============================================================ -->
+        <section class="content-section" id="section-30">
+            <div class="section-header">
+                <div class="section-number">Section 30</div>
+                <h1 class="section-title">Final Revision</h1>
+                <p class="section-desc">Quick cheat sheet — everything you learned in Unit V.</p>
+            </div>
+            <div class="card">
+                <div class="revision-item"><span class="revision-term">ASP.NET Core</span><span class="revision-def">Framework for building web applications/APIs</span></div>
+                <div class="revision-item"><span class="revision-term">API</span><span class="revision-def">Communication bridge between applications</span></div>
+                <div class="revision-item"><span class="revision-term">REST</span><span class="revision-def">API design style using HTTP methods</span></div>
+                <div class="revision-item"><span class="revision-term">GET</span><span class="revision-def">Read data</span></div>
+                <div class="revision-item"><span class="revision-term">POST</span><span class="revision-def">Create new data</span></div>
+                <div class="revision-item"><span class="revision-term">PUT</span><span class="revision-def">Update existing data</span></div>
+                <div class="revision-item"><span class="revision-term">DELETE</span><span class="revision-def">Delete data</span></div>
+                <div class="revision-item"><span class="revision-term">Middleware</span><span class="revision-def">Request/response pipeline component</span></div>
+                <div class="revision-item"><span class="revision-term">Kestrel</span><span class="revision-def">Embedded web server used by ASP.NET Core</span></div>
+                <div class="revision-item"><span class="revision-term">Runtime</span><span class="revision-def">Environment that executes the application</span></div>
+                <div class="revision-item"><span class="revision-term">Host</span><span class="revision-def">Manages configuration, logging, lifetime</span></div>
+                <div class="revision-item"><span class="revision-term">Authentication</span><span class="revision-def">Who are you?</span></div>
+                <div class="revision-item"><span class="revision-term">Authorization</span><span class="revision-def">What can you do?</span></div>
+                <div class="revision-item"><span class="revision-term">JWT</span><span class="revision-def">Token used for authentication</span></div>
+                <div class="revision-item"><span class="revision-term">Swagger</span><span class="revision-def">API documentation and testing UI</span></div>
+                <div class="revision-item"><span class="revision-term">[Authorize]</span><span class="revision-def">Attribute to protect endpoints</span></div>
+            </div>
+
+            <h3><i class="fa-solid fa-list-check"></i> Final One-Page Flow</h3>
+            <div class="flow-diagram">
+                <div class="flow-node highlight-blue">CREATE PROJECT</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">PROGRAM.CS</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">MODEL</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">CONTROLLER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">GET / POST / PUT / DELETE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">REST</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">SWAGGER</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">MIDDLEWARE</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">RUNTIME + HOST</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-cyan">KESTREL</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-red">AUTHENTICATION</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-purple">JWT</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-yellow">AUTHORIZATION</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-green">PROTECTED API</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-node highlight-blue">COMPLETE REQUEST / RESPONSE</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="text-center mb-3">
+                <h2 style="color:var(--success);font-size:1.8em;font-weight:800;margin-bottom:16px;">UNIT V COMPLETE</h2>
+                <p style="font-size:1.05em;color:var(--text-main);font-weight:600;margin-bottom:20px;">You now understand:</p>
+            </div>
+
+            <ul class="checklist">
+                <li>Web API</li>
+                <li>ASP.NET Core</li>
+                <li>REST</li>
+                <li>CRUD</li>
+                <li>HTTP Methods</li>
+                <li>Status Codes</li>
+                <li>Swagger</li>
+                <li>Middleware</li>
+                <li>Runtime</li>
+                <li>Generic Host</li>
+                <li>Kestrel</li>
+                <li>Authentication</li>
+                <li>Authorization</li>
+                <li>JWT</li>
+                <li>Protected APIs</li>
+                <li>Complete Request Lifecycle</li>
+            </ul>
+
+            <div class="text-center" style="margin-top:40px;">
+                <button class="btn btn-success" style="padding:14px 32px;font-size:1em;" onclick="showFinalProject()">
+                    <i class="fa-solid fa-rocket"></i> START THE PROJECT IN VISUAL STUDIO
+                </button>
+            </div>
+
+            <div class="output-panel" id="final-project-steps" style="margin-top:20px;">
+                <div style="color:var(--success);font-weight:600;margin-bottom:10px;">📋 Project Setup Steps:</div>
+                <div>1. Open Visual Studio</div>
+                <div>2. Create ASP.NET Core Web API project</div>
+                <div>3. Name it: ProductApi</div>
+                <div>4. Add Models/Product.cs</div>
+                <div>5. Add Controllers/ProductsController.cs</div>
+                <div>6. Update Program.cs</div>
+                <div>7. Press F5 to Run</div>
+                <div>8. Open Swagger at /swagger</div>
+                <div>9. Test GET /api/products</div>
+                <div>10. Test POST /api/products</div>
+                <div>11. Test PUT /api/products/1</div>
+                <div>12. Test DELETE /api/products/1</div>
+            </div>
+
+            <div class="section-nav">
+                <button class="btn" onclick="goToSection(29)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goToSyllabus()"><i class="fa-solid fa-book"></i> Syllabus Overview</button>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ===== COPY TOAST ===== -->
+<div class="copy-toast" id="copyToast">
+    <i class="fa-solid fa-check-circle"></i> Copied to clipboard!
+</div>
+
+<!-- ===== PRISM.JS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+<!-- ===== MAIN JAVASCRIPT ===== -->
+<script>
+// ============================================================
+// SESSION DATA
+// ============================================================
+const sessions = [
+    { num: 1, title: 'What Are We Building?', desc: 'Introducing the Product Management Web API.' },
+    { num: 2, title: 'Web Application Basics', desc: 'How web apps work — frontend, backend, API, database.' },
+    { num: 3, title: 'What is an API?', desc: 'Understanding APIs with real-world analogies.' },
+    { num: 4, title: 'What is ASP.NET Core?', desc: 'Microsoft\'s framework for building modern web APIs.' },
+    { num: 5, title: 'Create Project in Visual Studio', desc: 'Step-by-step project creation guide.' },
+    { num: 6, title: 'Project Structure', desc: 'Understanding the files and folders.' },
+    { num: 7, title: 'Program.cs', desc: 'The entry point and configuration.' },
+    { num: 8, title: 'Model', desc: 'Creating the Product model.' },
+    { num: 9, title: 'Controller', desc: 'Building the ProductsController.' },
+    { num: 10, title: 'GET API', desc: 'Reading data — the most common operation.' },
+    { num: 11, title: 'POST API', desc: 'Creating new products.' },
+    { num: 12, title: 'GET by ID', desc: 'Retrieving a specific product.' },
+    { num: 13, title: 'PUT API', desc: 'Updating existing products.' },
+    { num: 14, title: 'DELETE API', desc: 'Removing products.' },
+    { num: 15, title: 'RESTful API', desc: 'Understanding REST design principles.' },
+    { num: 16, title: 'HTTP Status Codes', desc: 'What the server tells the client.' },
+    { num: 17, title: 'Swagger Testing', desc: 'Testing the API without writing client code.' },
+    { num: 18, title: 'Middleware', desc: 'The request/response pipeline.' },
+    { num: 19, title: 'ASP.NET Core Runtime', desc: 'The environment that runs your app.' },
+    { num: 20, title: 'Generic Host', desc: 'The manager of your application.' },
+    { num: 21, title: 'Kestrel', desc: 'The embedded web server.' },
+    { num: 22, title: 'Authentication', desc: 'Verifying identity — who are you?' },
+    { num: 23, title: 'Authorization', desc: 'Checking permissions — what can you do?' },
+    { num: 24, title: 'JWT', desc: 'JSON Web Tokens for secure authentication.' },
+    { num: 25, title: 'Protect API with [Authorize]', desc: 'Restricting access to endpoints.' },
+    { num: 26, title: 'Complete Request Flow', desc: 'The biggest picture — end-to-end request journey.' },
+    { num: 27, title: 'Complete Project', desc: 'All files ready to copy into Visual Studio.' },
+    { num: 28, title: 'Hands-On Exercises', desc: 'Practice from Level 1 to Level 8.' },
+    { num: 29, title: 'Interview Questions', desc: 'Beginner-friendly Q&A.' },
+    { num: 30, title: 'Final Revision', desc: 'Quick cheat sheet and final flow.' }
+];
+
+const TOTAL_SECTIONS = 30;
+let visitedSections = new Set();
+let currentSection = 0;
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goToSection(num) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('section-' + num);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+        if (parseInt(el.dataset.section) === num) el.classList.add('active');
+    });
+    if (num >= 1 && num <= TOTAL_SECTIONS) visitedSections.add(num);
+    currentSection = num;
+    updateProgress();
+    updateNavCompletion();
+    updateDashboardStats();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
+}
+
+function goToSyllabus() {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+    document.getElementById('section-syllabus').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.section === 'syllabus') el.classList.add('active');
+    });
+    currentSection = 'syllabus';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
+}
+
+function updateProgress() {
+    const visited = visitedSections.size;
+    const percent = Math.round((visited / TOTAL_SECTIONS) * 100);
+    document.getElementById('progressPercent').textContent = percent + '%';
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('topicsCount').textContent = visited + ' / ' + TOTAL_SECTIONS;
+}
+
+function updateNavCompletion() {
+    document.querySelectorAll('.nav-item').forEach(el => {
+        const sectionNum = parseInt(el.dataset.section);
+        if (visitedSections.has(sectionNum) && sectionNum !== currentSection) el.classList.add('completed');
+        else el.classList.remove('completed');
+    });
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+    const grid = document.getElementById('dashboardGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    sessions.forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'dashboard-card';
+        card.dataset.section = s.num;
+        card.innerHTML = `
+            <div class="dc-num">Session ${String(s.num).padStart(2, '0')}</div>
+            <div class="dc-title">${s.title}</div>
+            <div class="dc-desc">${s.desc}</div>
+            <div class="dc-badge">${visitedSections.has(s.num) ? '✓ Completed' : 'Not started'}</div>
+        `;
+        card.onclick = () => goToSection(s.num);
+        grid.appendChild(card);
+    });
+    updateDashboardStats();
+}
+
+function updateDashboardStats() {
+    const totalEl = document.getElementById('totalSessionsDisplay');
+    const completedEl = document.getElementById('completedSessionsDisplay');
+    if (totalEl) totalEl.textContent = TOTAL_SECTIONS;
+    if (completedEl) completedEl.textContent = visitedSections.size;
+    document.querySelectorAll('.dashboard-card').forEach(card => {
+        const num = parseInt(card.dataset.section);
+        const badge = card.querySelector('.dc-badge');
+        if (badge) {
+            if (visitedSections.has(num)) {
+                badge.textContent = '✓ Completed';
+                badge.style.background = 'var(--success-bg)';
+                badge.style.color = 'var(--success)';
+            } else {
+                badge.textContent = 'Not started';
+                badge.style.background = 'var(--border)';
+                badge.style.color = 'var(--text-dim)';
+            }
+        }
+    });
+}
+
+// ============================================================
+// CLASSROOM MODE
+// ============================================================
+function toggleClassroomMode() {
+    document.body.classList.toggle('classroom-mode');
+    const btn = document.getElementById('classroomBtn');
+    if (document.body.classList.contains('classroom-mode')) {
+        btn.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i> <span>Exit</span>';
+        btn.classList.add('success');
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i> <span>Classroom</span>';
+        btn.classList.remove('success');
+    }
+}
+
+// ============================================================
+// COPY
+// ============================================================
+function copyCode(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const text = el.innerText || el.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showCopyToast());
+    } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showCopyToast();
+    }
+}
+function showCopyToast() {
+    const toast = document.getElementById('copyToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ============================================================
+// UI TOGGLES
+// ============================================================
+function toggleExpandable(header) {
+    const parent = header.closest('.expandable');
+    parent.classList.toggle('open');
+}
+function toggleExplain(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('show');
+}
+function toggleOutput(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('show');
+}
+function toggleStatus(card) {
+    const extra = card.querySelector('.status-extra');
+    if (extra) extra.style.display = extra.style.display === 'none' ? 'block' : 'none';
+}
+function toggleSwagger(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+}
+function toggleSolution(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('show');
+}
+function showFinalProject() {
+    const el = document.getElementById('final-project-steps');
+    if (el) el.classList.toggle('show');
+}
+function toggleInterview(header) {
+    const item = header.closest('.interview-item');
+    item.classList.toggle('open');
+}
+
+// ============================================================
+// SWAGGER SIMULATION
+// ============================================================
+function simulateSwagger(type) {
+    const responses = {
+        'get': `HTTP/1.1 200 OK\nContent-Type: application/json\n\n[\n  { "id": 1, "name": "Laptop", "price": 50000 },\n  { "id": 2, "name": "Mouse", "price": 1000 }\n]`,
+        'getbyid': `HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "id": 1,\n  "name": "Laptop",\n  "price": 50000\n}`,
+        'post': `HTTP/1.1 201 Created\nContent-Type: application/json\n\n{\n  "id": 3,\n  "name": "Keyboard",\n  "price": 1500\n}`,
+        'put': `HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "id": 1,\n  "name": "Gaming Laptop",\n  "price": 75000\n}`,
+        'delete': `HTTP/1.1 204 No Content`
+    };
+    const el = document.getElementById('swagger-' + type + '-response');
+    if (el) { el.textContent = responses[type] || 'No response.'; el.style.color = '#3b4151'; }
+}
+
+// ============================================================
+// SIMULATIONS
+// ============================================================
+function simulateGet() {
+    const out = document.getElementById('get-sim-output');
+    out.textContent = 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n[\n  { "id": 1, "name": "Laptop", "price": 50000 },\n  { "id": 2, "name": "Mouse", "price": 1000 }\n]';
+    out.style.color = '#ccc';
+}
+function simulatePost() {
+    const name = document.getElementById('post-name').value || 'New Product';
+    const price = parseFloat(document.getElementById('post-price').value) || 0;
+    const out = document.getElementById('post-sim-output');
+    out.textContent = `HTTP/1.1 201 Created\nContent-Type: application/json\n\n{\n  "id": 3,\n  "name": "${name}",\n  "price": ${price}\n}`;
+    out.style.color = '#ccc';
+}
+function simulateGetById() {
+    const id = parseInt(document.getElementById('getbyid-input').value) || 0;
+    const out = document.getElementById('getbyid-sim-output');
+    if (id === 1) out.textContent = 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "id": 1,\n  "name": "Laptop",\n  "price": 50000\n}';
+    else if (id === 2) out.textContent = 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "id": 2,\n  "name": "Mouse",\n  "price": 1000\n}';
+    else out.textContent = 'HTTP/1.1 404 Not Found\n\n// No product with ID ' + id;
+    out.style.color = '#ccc';
+}
+function simulatePut() {
+    const id = parseInt(document.getElementById('put-id').value) || 1;
+    const name = document.getElementById('put-name').value || 'Updated';
+    const price = parseFloat(document.getElementById('put-price').value) || 0;
+    const out = document.getElementById('put-sim-output');
+    if (id === 1 || id === 2) out.textContent = `HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "id": ${id},\n  "name": "${name}",\n  "price": ${price}\n}`;
+    else out.textContent = 'HTTP/1.1 404 Not Found\n\n// No product with ID ' + id;
+    out.style.color = '#ccc';
+}
+function simulateDelete() {
+    const id = parseInt(document.getElementById('delete-id').value) || 0;
+    const out = document.getElementById('delete-sim-output');
+    if (id === 1 || id === 2) out.textContent = 'HTTP/1.1 204 No Content\n\n// Product ' + id + ' deleted.';
+    else out.textContent = 'HTTP/1.1 404 Not Found\n\n// No product with ID ' + id;
+    out.style.color = '#ccc';
+}
+
+// ============================================================
+// FLOW INFO
+// ============================================================
+const flowInfo = {
+    'user': 'The person using the application.',
+    'browser': 'The frontend that sends HTTP requests.',
+    'http': 'The protocol for sending requests and responses.',
+    'kestrel': 'The web server that receives the request.',
+    'runtime': 'The .NET runtime that executes C# code.',
+    'middleware': 'Components that process the request in order.',
+    'authn': 'Authentication — verifies WHO the user is.',
+    'authz': 'Authorization — checks WHAT the user can do.',
+    'routing': 'Matches the URL to the controller action.',
+    'controller': 'The class that handles the request.',
+    'logic': 'The business logic inside the action.',
+    'data': 'The data store (in-memory list or database).',
+    'response': 'The HTTP response sent back.',
+    'json': 'The data format used in the response.',
+    'frontend2': 'The frontend receives the response and updates the UI.',
+    'user2': 'The user sees the result.'
+};
+function showFlowInfo(key) {
+    const panel = document.getElementById('flow-info-panel');
+    const text = document.getElementById('flow-info-text');
+    if (flowInfo[key]) { text.textContent = flowInfo[key]; panel.style.display = 'block'; }
+}
+
+// ============================================================
+// INTERVIEW QUESTIONS
+// ============================================================
+const interviewQuestions = [
+    { q: 'What is ASP.NET Core?', a: 'A free, open-source, cross-platform framework by Microsoft for building web applications and APIs using C#.' },
+    { q: 'What is a Web API?', a: 'An application programming interface accessible over HTTP. Clients send requests; the API returns responses (usually JSON).' },
+    { q: 'What is REST?', a: 'A design style for APIs using standard HTTP methods (GET, POST, PUT, DELETE). REST APIs are stateless and resource-based.' },
+    { q: 'What is GET?', a: 'An HTTP method used to READ data. Never modifies data.' },
+    { q: 'What is POST?', a: 'An HTTP method used to CREATE new data. Data is sent in the request body.' },
+    { q: 'What is PUT?', a: 'An HTTP method used to UPDATE existing data. Replaces the entire resource.' },
+    { q: 'What is DELETE?', a: 'An HTTP method used to REMOVE data.' },
+    { q: 'What is middleware?', a: 'Software components in a pipeline. Each can process, pass forward, or short-circuit the request.' },
+    { q: 'What is Kestrel?', a: 'The default cross-platform embedded web server used by ASP.NET Core.' },
+    { q: 'What is the Generic Host?', a: 'The object that manages the application — configuration, logging, DI, and lifetime.' },
+    { q: 'What is authentication?', a: 'Verifying WHO a user is. Answers "Are you who you claim to be?"' },
+    { q: 'What is authorization?', a: 'Determining WHAT a user can do. Happens after authentication.' },
+    { q: 'What is JWT?', a: 'JSON Web Token — a secure string used for authentication. Sent in the Authorization header as Bearer token.' },
+    { q: 'What is [Authorize]?', a: 'An attribute that restricts access to authenticated users. Returns 401 if not authenticated.' },
+    { q: 'What is HTTP 404?', a: 'Not Found — the requested resource doesn\'t exist.' },
+    { q: 'What is HTTP 401?', a: 'Unauthorized — authentication is missing or invalid.' },
+    { q: 'Difference between 401 and 403?', a: '401 = not logged in (authentication failed). 403 = logged in but no permission (authorization failed).' },
+    { q: 'What happens when a request reaches an ASP.NET Core API?', a: 'Kestrel receives it → middleware pipeline (HTTPS, auth, routing) → controller action → response back through pipeline.' }
+];
+function renderInterviewQuestions() {
+    const container = document.getElementById('interview-list');
+    if (!container) return;
+    interviewQuestions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'interview-item';
+        div.innerHTML = `
+            <div class="interview-q" onclick="toggleInterview(this)">
+                <span><span class="q-num">Q${index + 1}.</span> ${item.q}</span>
+                <span class="arrow">▶</span>
+            </div>
+            <div class="interview-a">${item.a}</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    renderDashboard();
+    renderInterviewQuestions();
+    updateProgress();
+    updateNavCompletion();
+    if (window.Prism) Prism.highlightAll();
+});
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' && typeof currentSection === 'number' && currentSection < TOTAL_SECTIONS) goToSection(currentSection + 1);
+    else if (e.key === 'ArrowLeft' && typeof currentSection === 'number' && currentSection > 0) goToSection(currentSection - 1);
+});
+</script>
+
+</body>
+</html>

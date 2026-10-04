@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XT - Web API & ASP.NET Core - Clear Flow Guide</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
+    --border: #30363d;
+    --code-bg: #1f242b;
+    --success: #238636;
+    --success-hover: #2ea043;
+    --warning: #d29922;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    padding: 20px;
+    max-width: 1050px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h1 { color: #fff; font-size: 2rem; margin-bottom: 8px; }
+  h1 span { color: var(--accent); }
+  header p { color: var(--muted); }
+
+  .flow-map {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+  }
+
+  .flow-map span {
+    background: #21262d;
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: var(--text);
+  }
+
+  .flow-map i {
+    color: var(--accent);
+    align-self: center;
+  }
+
+  .progress-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .progress-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
+    transform: translateY(-50%);
+  }
+
+  .step-indicator {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+    transition: 0.25s;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .step-indicator.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.45);
+  }
+
+  .step-indicator.completed {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+
+  .topic {
+    display: none;
+    animation: fadeIn 0.35s ease-in-out;
+    flex-grow: 1;
+  }
+
+  .topic.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 {
+    color: #fff;
+    font-size: 1.45rem;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  h3 {
+    color: var(--accent);
+    font-size: 1.08rem;
+    margin: 22px 0 10px;
+  }
+
+  p { margin-bottom: 14px; color: var(--muted); }
+  strong { color: #fff; }
+
+  .key-box {
+    background: rgba(88, 166, 255, 0.08);
+    border-left: 4px solid var(--accent);
+    padding: 12px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 18px 0;
+    color: var(--text);
+  }
+
+  .key-box strong { color: var(--accent); }
+
+  .code-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: #21262d;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .code-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--border);
+    color: var(--text);
+    border: 1px solid #444c56;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+
+  .btn:hover { background: #444c56; color: #fff; }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+  .btn-success:hover { background: var(--success-hover); border-color: var(--success-hover); }
+
+  pre {
+    margin: 0 !important;
+    border-radius: 0 0 10px 10px !important;
+    font-family: 'Fira Code', monospace !important;
+    font-size: 0.88rem !important;
+    background: var(--code-bg) !important;
+    padding: 18px !important;
+    overflow-x: auto;
+  }
+
+  code { font-family: 'Fira Code', monospace !important; }
+
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-buttons .btn {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
+
+  .nav-buttons .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 14px; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; }
+    .step-indicator { width: 30px; height: 30px; font-size: 0.72rem; }
+    .code-header { flex-direction: column; align-items: flex-start; }
+    .nav-buttons { flex-direction: column; }
+    .nav-buttons .btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+
+<body>
+<header>
+  <h1>XT <span>Web API & ASP.NET Core</span></h1>
+  <p>Clear topic-by-topic flow for hands-on understanding</p>
+
+  <div class="flow-map">
+    <span>1. Web API</span> <i class="fa-solid fa-arrow-right"></i>
+    <span>2. REST</span> <i class="fa-solid fa-arrow-right"></i>
+    <span>3. Security</span> <i class="fa-solid fa-arrow-right"></i>
+    <span>4. Host</span> <i class="fa-solid fa-arrow-right"></i>
+    <span>5. Kestrel</span> <i class="fa-solid fa-arrow-right"></i>
+    <span>6. Middleware</span>
+  </div>
+</header>
+
+<div class="progress-container">
+  <button class="step-indicator active" data-topic="1">1</button>
+  <button class="step-indicator" data-topic="2">2</button>
+  <button class="step-indicator" data-topic="3">3</button>
+  <button class="step-indicator" data-topic="4">4</button>
+  <button class="step-indicator" data-topic="5">5</button>
+  <button class="step-indicator" data-topic="6">6</button>
+</div>
+
+<main>
+  <!-- TOPIC 1 -->
+  <section id="topic-1" class="topic active">
+    <h2><i class="fa-solid fa-cube"></i> Topic 1: Designing & Building a Web API</h2>
+    <p><strong>Concept:</strong> A Web API lets applications communicate over HTTP. ASP.NET Core builds RESTful APIs using controllers.</p>
+
+    <h3>Step 1: Create the project</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-terminal"></i> Terminal</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t1_code1')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+      </div>
+      <pre><code id="t1_code1" class="language-bash">dotnet new webapi -n MyFirstApi
+cd MyFirstApi
+dotnet run</code></pre>
+    </div>
+
+    <h3>Step 2: Program.cs configuration</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-file-code"></i> Program.cs</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t1_code2')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+      </div>
+      <pre><code id="t1_code2" class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> AddControllers() registers controller support. MapControllers() maps incoming HTTP requests to controller actions.
+    </div>
+  </section>
+
+  <!-- TOPIC 2 -->
+  <section id="topic-2" class="topic">
+    <h2><i class="fa-solid fa-network-wired"></i> Topic 2: Designing RESTful Interface</h2>
+    <p><strong>Concept:</strong> REST uses HTTP verbs: GET, POST, PUT, DELETE. Routing maps URLs to controllers and actions.</p>
+
+    <h3>Hands-on: REST controller simulation</h3>
+    <p>This console simulation shows how a RESTful Products API behaves. You can paste it into .NET Fiddle.</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-terminal"></i> Console Simulation</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t2_code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+          <a href="https://dotnetfiddle.net/" target="_blank" class="btn btn-success"><i class="fa-solid fa-play"></i> Run on .NET Fiddle</a>
+        </div>
+      </div>
+      <pre><code id="t2_code1" class="language-csharp">using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+
+public class ProductsController
+{
+    private static List&lt;Product&gt; _db = new List&lt;Product&gt;
+    {
+        new Product { Id = 1, Name = "Laptop", Price = 1200 },
+        new Product { Id = 2, Name = "Mouse", Price = 25 }
+    };
+
+    // GET: api/products
+    public void Get()
+    {
+        Console.WriteLine("HTTP 200 OK:");
+        foreach (var p in _db)
+            Console.WriteLine($"  [{p.Id}] {p.Name} - ${p.Price}");
+    }
+
+    // POST: api/products
+    public void Post(string name, decimal price)
+    {
+        var newProduct = new Product
+        {
+            Id = _db.Max(p =&gt; p.Id) + 1,
+            Name = name,
+            Price = price
+        };
+
+        _db.Add(newProduct);
+        Console.WriteLine($"HTTP 201 Created: Added '{newProduct.Name}' (ID: {newProduct.Id})");
+    }
+
+    // DELETE: api/products/1
+    public void Delete(int id)
+    {
+        var product = _db.FirstOrDefault(p =&gt; p.Id == id);
+
+        if (product != null)
+        {
+            _db.Remove(product);
+            Console.WriteLine($"HTTP 204 No Content: Deleted ID {id}");
+        }
+        else
+        {
+            Console.WriteLine($"HTTP 404 Not Found: ID {id} does not exist.");
+        }
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("--- Starting Simulated RESTful API ---\n");
+        var api = new ProductsController();
+
+        api.Get();
+        Console.WriteLine();
+
+        api.Post("Keyboard", 75);
+        Console.WriteLine();
+
+        api.Get();
+        Console.WriteLine();
+
+        api.Delete(1);
+        Console.WriteLine();
+
+        api.Delete(99);
+    }
+}</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> GET returns data, POST creates, DELETE removes. Status codes matter: 200, 201, 204, 404.
+    </div>
+  </section>
+
+  <!-- TOPIC 3 -->
+  <section id="topic-3" class="topic">
+    <h2><i class="fa-solid fa-shield-halved"></i> Topic 3: Securing a Web API</h2>
+    <p><strong>Concept:</strong> JWT is commonly used. The client authenticates, receives a token, and sends it in the Authorization header.</p>
+
+    <h3>Generate a JWT token</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-terminal"></i> JWT Basics</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t3_code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+          <a href="https://dotnetfiddle.net/" target="_blank" class="btn btn-success"><i class="fa-solid fa-play"></i> Run on .NET Fiddle</a>
+        </div>
+      </div>
+      <pre><code id="t3_code1" class="language-csharp">using System;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+public class Program
+{
+    public static void Main()
+    {
+        var secretKey = "ThisIsMySuperSecretKeyForJwtToken123!";
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, "user123"),
+            new Claim(JwtRegisteredClaimNames.Email, "user@example.com"),
+            new Claim(ClaimTypes.Role, "Admin")
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: "MyApp",
+            audience: "MyAppUsers",
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(30),
+            signingCredentials: credentials
+        );
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtString = tokenHandler.WriteToken(token);
+
+        Console.WriteLine("--- Generated JWT Token ---");
+        Console.WriteLine(jwtString);
+        Console.WriteLine("\nClient sends it as: Authorization: Bearer &lt;token&gt;");
+    }
+}</code></pre>
+    </div>
+
+    <h3>ASP.NET Core JWT setup</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-file-code"></i> Program.cs</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t3_code2')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+      </div>
+      <pre><code id="t3_code2" class="language-csharp">builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =&gt;
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "MyApp",
+            ValidAudience = "MyAppUsers",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("ThisIsMySuperSecretKeyForJwtToken123!"))
+        };
+    });
+
+app.UseAuthentication();
+app.UseAuthorization();</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> UseAuthentication() identifies the user. UseAuthorization() checks permissions. Authentication must come before Authorization.
+    </div>
+  </section>
+
+  <!-- TOPIC 4 -->
+  <section id="topic-4" class="topic">
+    <h2><i class="fa-solid fa-server"></i> Topic 4: ASP.NET Core Runtime Environment & Host</h2>
+    <p><strong>Concept:</strong> The Generic Host manages startup, dependency injection, logging, configuration, and lifetime.</p>
+
+    <h3>Host lifecycle simulation</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-terminal"></i> Console Simulation</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t4_code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+          <a href="https://dotnetfiddle.net/" target="_blank" class="btn btn-success"><i class="fa-solid fa-play"></i> Run on .NET Fiddle</a>
+        </div>
+      </div>
+      <pre><code id="t4_code1" class="language-csharp">using System;
+
+public class WebApplication
+{
+    public static WebApplicationBuilder CreateBuilder(string[] args)
+    {
+        Console.WriteLine("[Host] Creating Builder...");
+        return new WebApplicationBuilder();
+    }
+
+    public static void Run(string message)
+    {
+        Console.WriteLine("[Host] Application Started.");
+        Console.WriteLine($"[Host] {message}");
+        Console.WriteLine("[Host] Listening for requests...");
+    }
+}
+
+public class WebApplicationBuilder
+{
+    public void AddServices()
+    {
+        Console.WriteLine("[Host] Configuring Dependency Injection...");
+        Console.WriteLine("  - Registered: ILogger, IConfiguration, Controllers");
+    }
+
+    public void Build()
+    {
+        Console.WriteLine("[Host] Building the application pipeline...");
+    }
+}
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.AddServices();
+        builder.Build();
+
+        WebApplication.Run("Host is running on http://localhost:5000");
+    }
+}</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> Flow is: CreateBuilder → AddServices → Build → Run. The host starts Kestrel and manages the app lifetime.
+    </div>
+  </section>
+
+  <!-- TOPIC 5 -->
+  <section id="topic-5" class="topic">
+    <h2><i class="fa-solid fa-microchip"></i> Topic 5: Embedded HTTP Server (Kestrel)</h2>
+    <p><strong>Concept:</strong> Kestrel is the default cross-platform embedded web server in ASP.NET Core. It is fast, lightweight, and part of the app process.</p>
+
+    <h3>Configure Kestrel in code</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-file-code"></i> Program.cs</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t5_code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+        </div>
+      </div>
+      <pre><code id="t5_code1" class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(serverOptions =&gt;
+{
+    serverOptions.Limits.MaxConcurrentConnections = 100;
+    serverOptions.Limits.MaxRequestBodySize = 10 * 1024 * 1024;
+
+    serverOptions.ListenAnyIP(5000);
+});
+
+var app = builder.Build();
+
+app.MapGet("/", () =&gt; "Hello from Kestrel Embedded Server!");
+app.Run();</code></pre>
+    </div>
+
+    <h3>Configure Kestrel in appsettings.json</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-file-code"></i> appsettings.json</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t5_code2')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+      </div>
+      <pre><code id="t5_code2" class="language-json">{
+  "Kestrel": {
+    "Endpoints": {
+      "Http": {
+        "Url": "http://localhost:5000"
+      },
+      "Https": {
+        "Url": "https://localhost:5001"
+      }
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> Kestrel is the default server. You can configure ports, HTTPS, and limits in code or appsettings.json.
+    </div>
+  </section>
+
+  <!-- TOPIC 6 -->
+  <section id="topic-6" class="topic">
+    <h2><i class="fa-solid fa-layer-group"></i> Topic 6: ASP.NET Core Middleware</h2>
+    <p><strong>Concept:</strong> Middleware components form a request pipeline. Each can process the request, pass it on, or stop it.</p>
+
+    <h3>Middleware pipeline simulation</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-terminal"></i> Console Simulation</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t6_code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+          <a href="https://dotnetfiddle.net/" target="_blank" class="btn btn-success"><i class="fa-solid fa-play"></i> Run on .NET Fiddle</a>
+        </div>
+      </div>
+      <pre><code id="t6_code1" class="language-csharp">using System;
+using System.Threading.Tasks;
+
+public class HttpContext
+{
+    public string RequestPath { get; set; } = "/api/data";
+}
+
+public delegate Task RequestDelegate(HttpContext context);
+
+public class Program
+{
+    public static async Task Main()
+    {
+        Console.WriteLine("--- Starting Middleware Pipeline ---\n");
+
+        RequestDelegate middleware1 = async (context) =&gt;
+        {
+            Console.WriteLine("[Middleware 1] Request started: " + context.RequestPath);
+            await Task.CompletedTask;
+        };
+
+        RequestDelegate middleware2 = async (context) =&gt;
+        {
+            Console.WriteLine("[Middleware 2] Authenticating...");
+            Console.WriteLine("[Middleware 2] User Authenticated!");
+            await Task.CompletedTask;
+        };
+
+        RequestDelegate endpoint = async (context) =&gt;
+        {
+            Console.WriteLine("[Endpoint] Processing request...");
+            Console.WriteLine("[Endpoint] Returning HTTP 200 OK");
+            await Task.CompletedTask;
+        };
+
+        RequestDelegate pipeline = async (context) =&gt;
+        {
+            await middleware1(context);
+            await middleware2(context);
+            await endpoint(context);
+        };
+
+        var httpContext = new HttpContext();
+        await pipeline(httpContext);
+
+        Console.WriteLine("\n--- Pipeline Finished ---");
+    }
+}</code></pre>
+    </div>
+
+    <h3>Real ASP.NET Core middleware order</h3>
+    <div class="code-container">
+      <div class="code-header">
+        <span><i class="fa-solid fa-file-code"></i> Program.cs</span>
+        <div class="code-actions">
+          <button class="btn" onclick="copyCode('t6_code2')"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+      </div>
+      <pre><code id="t6_code2" class="language-csharp">var app = builder.Build();
+
+// ORDER IS CRITICAL
+app.UseExceptionHandler("/Error");
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();</code></pre>
+    </div>
+
+    <div class="key-box">
+      <strong>Key takeaway:</strong> Middleware order matters. Authentication must come before Authorization. Routing must come before controllers.
+    </div>
+  </section>
+</main>
+
+<div class="nav-buttons">
+  <button id="prevBtn" class="btn" onclick="changeTopic(-1)" disabled>
+    <i class="fa-solid fa-arrow-left"></i> Previous
+  </button>
+  <button id="nextBtn" class="btn btn-primary" onclick="changeTopic(1)">
+    Next <i class="fa-solid fa-arrow-right"></i>
+  </button>
+</div>
+
+<script>
+  let currentTopic = 1;
+  const totalTopics = 6;
+
+  function showTopic(topicNumber) {
+    document.querySelectorAll('.topic').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step-indicator').forEach(el => {
+      el.classList.remove('active', 'completed');
+    });
+
+    document.getElementById(`topic-${topicNumber}`).classList.add('active');
+
+    document.querySelectorAll('.step-indicator').forEach((el, index) => {
+      const num = index + 1;
+      if (num === topicNumber) el.classList.add('active');
+      else if (num < topicNumber) el.classList.add('completed');
+    });
+
+    currentTopic = topicNumber;
+
+    document.getElementById('prevBtn').disabled = currentTopic === 1;
+    document.getElementById('nextBtn').disabled = currentTopic === totalTopics;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeTopic(direction) {
+    const next = currentTopic + direction;
+    if (next >= 1 && next <= totalTopics) showTopic(next);
+  }
+
+  function copyCode(elementId) {
+    const codeElement = document.getElementById(elementId);
+    const textArea = document.createElement('textarea');
+    textArea.value = codeElement.innerText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+    btn.style.background = 'var(--success)';
+    btn.style.borderColor = 'var(--success)';
+    btn.style.color = '#fff';
+
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 1800);
+  }
+
+  document.querySelectorAll('.step-indicator').forEach(btn => {
+    btn.addEventListener('click', () => showTopic(Number(btn.dataset.topic)));
+  });
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') changeTopic(1);
+    if (e.key === 'ArrowLeft') changeTopic(-1);
+  });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>

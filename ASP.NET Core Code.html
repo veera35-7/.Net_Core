@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit V - Hands-On .NET Web API Session</title>
+    <!-- Prism.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --border: #30363d;
+            --code-bg: #1f242b;
+            --success: #238636;
+            --success-hover: #2ea043;
+            --warning: #d29922;
+            --danger: #da3633;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.6em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--accent);
+            font-size: 1.2em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        ul {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            color: var(--text-muted);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* IDE-like Code Container */
+        .code-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #21262d;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--border);
+            color: var(--text-main);
+            border: 1px solid #444c56;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: #444c56;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        pre {
+            margin: 0 !important;
+            border-radius: 0 0 8px 8px !important;
+            font-family: 'Fira Code', monospace !important;
+            font-size: 0.9em !important;
+            background-color: var(--code-bg) !important;
+            padding: 20px !important;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace !important;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-get { background-color: #238636; color: #fff; }
+        .badge-post { background-color: #1f6feb; color: #fff; }
+        .badge-put { background-color: #d29922; color: #fff; }
+        .badge-delete { background-color: #da3633; color: #fff; }
+
+        /* Note Box */
+        .note-box {
+            background-color: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+        }
+        .note-box strong {
+            color: var(--accent);
+        }
+
+        /* Hands-on Section */
+        .hands-on {
+            background: linear-gradient(135deg, rgba(35, 134, 54, 0.1) 0%, rgba(13, 17, 23, 1) 100%);
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .hands-on h3 {
+            color: var(--success);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Steps */
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 15px;
+        }
+        .step-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: var(--success);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Unit V: <span>ASP.NET Core Web API</span></h1>
+        <p>Hands-On Interactive Session & Free Compiler Guide</p>
+    </header>
+
+    <div class="note-box">
+        <strong>💡 How to use this Hands-On Guide:</strong><br>
+        1. Read the concept.<br>
+        2. Click <b>Copy Code</b> on the code blocks.<br>
+        3. Go to the free online compiler <a href="https://dotnetfiddle.net/" target="_blank" style="color: var(--accent);">.NET Fiddle</a> or <a href="https://replit.com/" target="_blank" style="color: var(--accent);">Replit</a>.<br>
+        4. Paste the code and hit <b>Run</b> to see the output live!
+    </div>
+
+    <!-- SECTION 1: RESTful API Design -->
+    <h2><i class="fa-solid fa-network-wired"></i> 1. Designing RESTful Web API</h2>
+    <p><strong>Concept:</strong> A RESTful API uses standard HTTP verbs (GET, POST, PUT, DELETE) to perform operations on resources (like Products, Users). It is stateless and returns JSON.</p>
+    
+    <div class="code-container">
+        <div class="code-header">
+            <span><i class="fa-solid fa-file-code"></i> ProductsController.cs</span>
+            <div class="code-actions">
+                <button class="btn" onclick="copyCode('code1')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+            </div>
+        </div>
+        <pre><code id="code1" class="language-csharp">using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace MyWebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProductsController : ControllerBase
+    {
+        private static List&lt;Product&gt; _products = new List&lt;Product&gt;
+        {
+            new Product { Id = 1, Name = "Laptop", Price = 1200 },
+            new Product { Id = 2, Name = "Mouse", Price = 25 }
+        };
+
+        // GET: api/products (Read All)
+        [HttpGet]
+        public ActionResult&lt;IEnumerable&lt;Product&gt;&gt; GetProducts()
+        {
+            return Ok(_products);
+        }
+
+        // GET: api/products/1 (Read One)
+        [HttpGet("{id}")]
+        public ActionResult&lt;Product&gt; GetProduct(int id)
+        {
+            var product = _products.FirstOrDefault(p =&gt; p.Id == id);
+            if (product == null) return NotFound(); // 404
+            return Ok(product); // 200
+        }
+
+        // POST: api/products (Create)
+        [HttpPost]
+        public ActionResult&lt;Product&gt; CreateProduct([FromBody] Product product)
+        {
+            product.Id = _products.Max(p =&gt; p.Id) + 1;
+            _products.Add(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product); // 201
+        }
+
+        // DELETE: api/products/1 (Delete)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteProduct(int id)
+        {
+            var product = _products.FirstOrDefault(p =&gt; p.Id == id);
+            if (product == null) return NotFound();
+            _products.Remove(product);
+            return NoContent(); // 204
+        }
+    }
+
+    public class Product
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+}</code></pre>
+    </div>
+
+    <!-- SECTION 2: Hands-On Simulation -->
+    <h2><i class="fa-solid fa-flask"></i> 2. Hands-On: Simulating a Web API in Console</h2>
+    <p>Since online fiddles are primarily for console apps, let's write a C# program that <b>mimics</b> a REST API routing system. This helps you understand the logic behind HTTP verbs and status codes before deploying to a real server.</p>
+
+    <div class="hands-on">
+        <h3><i class="fa-solid fa-rocket"></i> Try this in .NET Fiddle (Free)</h3>
+        <p>Copy the code below, paste it into <a href="https://dotnetfiddle.net/" target="_blank" style="color: var(--accent);">dotnetfiddle.net</a>, and hit Run. This simulates a client calling your API.</p>
+        
+        <div class="code-container" style="border-color: var(--success);">
+            <div class="code-header">
+                <span><i class="fa-solid fa-terminal"></i> Program.cs (Console Simulation)</span>
+                <div class="code-actions">
+                    <button class="btn btn-primary" onclick="copyCode('code2')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+                    <a href="https://dotnetfiddle.net/" target="_blank" class="btn" style="background: var(--success); border-color: var(--success); color: #fff;"><i class="fa-solid fa-play"></i> Open .NET Fiddle</a>
+                </div>
+            </div>
+            <pre><code id="code2" class="language-csharp">using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// 1. Define the Model
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+
+// 2. Simulate a Web API Controller
+public class ProductsApiController
+{
+    private static List&lt;Product&gt; _db = new List&lt;Product&gt;
+    {
+        new Product { Id = 1, Name = "Laptop", Price = 1200 },
+        new Product { Id = 2, Name = "Mouse", Price = 25 }
+    };
+
+    // GET /api/products
+    public void GetAll() 
+    {
+        Console.WriteLine("HTTP 200 OK:");
+        foreach(var p in _db) Console.WriteLine($"  - {p.Id}: {p.Name} (${p.Price})");
+    }
+
+    // POST /api/products
+    public void Create(string name, decimal price)
+    {
+        var newProduct = new Product { Id = _db.Max(p =&gt; p.Id) + 1, Name = name, Price = price };
+        _db.Add(newProduct);
+        Console.WriteLine($"HTTP 201 Created: Added {newProduct.Name} with ID {newProduct.Id}");
+    }
+
+    // DELETE /api/products/{id}
+    public void Delete(int id)
+    {
+        var product = _db.FirstOrDefault(p =&gt; p.Id == id);
+        if (product != null)
+        {
+            _db.Remove(product);
+            Console.WriteLine($"HTTP 204 No Content: Deleted ID {id}");
+        }
+        else
+        {
+            Console.WriteLine($"HTTP 404 Not Found: ID {id} does not exist.");
+        }
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("--- Starting Simulated Web API Session ---\n");
+        var api = new ProductsApiController();
+
+        // Simulate Client Requests
+        api.GetAll();
+        Console.WriteLine();
+        
+        api.Create("Keyboard", 75);
+        Console.WriteLine();
+        
+        api.GetAll();
+        Console.WriteLine();
+        
+        api.Delete(1);
+        Console.WriteLine();
+        
+        api.Delete(99); // Triggers 404
+        Console.WriteLine();
+        
+        api.GetAll();
+    }
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- SECTION 3: Middleware -->
+    <h2><i class="fa-solid fa-layer-group"></i> 3. ASP.NET Core Middleware</h2>
+    <p><strong>Concept:</strong> Middleware are components that handle requests and responses in a pipeline. Each component can process the request before passing it to the next component (and process the response on the way back).</p>
+    
+    <div class="code-container">
+        <div class="code-header">
+            <span><i class="fa-solid fa-file-code"></i> RequestTimingMiddleware.cs</span>
+            <div class="code-actions">
+                <button class="btn" onclick="copyCode('code3')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+            </div>
+        </div>
+        <pre><code id="code3" class="language-csharp">using System.Diagnostics;
+
+public class RequestTimingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger&lt;RequestTimingMiddleware&gt; _logger;
+
+    public RequestTimingMiddleware(RequestDelegate next, ILogger&lt;RequestTimingMiddleware&gt; logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        
+        // Pass request to the next middleware in the pipeline
+        await _next(context);
+        
+        stopwatch.Stop();
+        var elapsedMs = stopwatch.ElapsedMilliseconds;
+        
+        // Log the time taken after the response comes back
+        _logger.LogInformation($"Request {context.Request.Path} took {elapsedMs} ms.");
+    }
+}
+
+// --- Registration in Program.cs ---
+// var app = builder.Build();
+// app.UseMiddleware&lt;RequestTimingMiddleware&gt;(); // Register here!
+// app.UseAuthentication();
+// app.UseAuthorization();
+// app.MapControllers();
+// app.Run();</code></pre>
+    </div>
+
+    <!-- SECTION 4: Security -->
+    <h2><i class="fa-solid fa-shield-halved"></i> 4. Securing Web API (JWT)</h2>
+    <p><strong>Concept:</strong> JSON Web Tokens (JWT) are used to securely transmit information. The server issues a token upon login, and the client sends it in the HTTP Header for protected routes.</p>
+
+    <div class="code-container">
+        <div class="code-header">
+            <span><i class="fa-solid fa-file-code"></i> Program.cs (JWT Configuration)</span>
+            <div class="code-actions">
+                <button class="btn" onclick="copyCode('code4')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+            </div>
+        </div>
+        <pre><code id="code4" class="language-csharp">using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Configure JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =&gt;
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "MyApp",
+            ValidAudience = "MyAppUsers",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisIsAVerySecretKey1234567890!"))
+        };
+    });
+
+builder.Services.AddControllers();
+var app = builder.Build();
+
+// 2. Add Middleware to the pipeline
+app.UseAuthentication(); // Must be BEFORE UseAuthorization
+app.UseAuthorization();
+
+app.MapControllers();
+app.Run();
+
+// --- How to protect a Controller ---
+// [Authorize] // Add this attribute to your Controller class or specific Action
+// [ApiController]
+// [Route("api/[controller]")]
+// public class SecureController : ControllerBase { ... }</code></pre>
+    </div>
+
+    <!-- SECTION 5: Runtime & Kestrel -->
+    <h2><i class="fa-solid fa-server"></i> 5. ASP.NET Core Runtime & Embedded Server (Kestrel)</h2>
+    <p><strong>Concept:</strong> ASP.NET Core uses the <strong>Generic Host</strong> to manage app startup and lifetime. It includes <strong>Kestrel</strong>, a cross-platform, lightning-fast embedded HTTP server. Unlike old .NET, Kestrel is built directly into the application process.</p>
+
+    <div class="code-container">
+        <div class="code-header">
+            <span><i class="fa-solid fa-file-code"></i> Program.cs (Kestrel Configuration)</span>
+            <div class="code-actions">
+                <button class="btn" onclick="copyCode('code5')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+            </div>
+        </div>
+        <pre><code id="code5" class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel (Embedded HTTP Server) directly in code
+builder.WebHost.ConfigureKestrel(serverOptions =&gt;
+{
+    // Set connection limits
+    serverOptions.Limits.MaxConcurrentConnections = 100;
+    serverOptions.Limits.MaxRequestBodySize = 10 * 1024; // 10 MB
+    
+    // You can also configure specific endpoints/ports here
+    // serverOptions.ListenAnyIP(5000); 
+    // serverOptions.ListenAnyIP(5001, listenOptions =&gt; listenOptions.UseHttps());
+});
+
+var app = builder.Build();
+
+// The Host manages the lifetime. app.Run() starts the Kestrel server.
+app.MapGet("/", () =&gt; "Hello from Kestrel Embedded Server!");
+app.Run();</code></pre>
+    </div>
+
+    <div class="note-box">
+        <strong>💡 Pro Tip for Hands-On:</strong> To practice creating a real ASP.NET Core Web API locally, open your terminal (Command Prompt / PowerShell) and run these commands:<br><br>
+        <code>dotnet new webapi -n MyFirstApi</code><br>
+        <code>cd MyFirstApi</code><br>
+        <code>dotnet run</code><br><br>
+        This will launch the Kestrel server on your machine (usually at <code>http://localhost:5000</code> or <code>https://localhost:5001</code>). You can then test your API using Postman or Swagger (built-in at <code>/swagger</code>).
+    </div>
+
+    <!-- JavaScript for Copy Functionality -->
+    <script>
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const textArea = document.createElement("textarea");
+            textArea.value = codeElement.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            
+            // Visual Feedback
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+            btn.style.backgroundColor = 'var(--success)';
+            btn.style.borderColor = 'var(--success)';
+            btn.style.color = '#fff';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        }
+    </script>
+    <!-- Prism.js for Syntax Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+</body>
+</html>

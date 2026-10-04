@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>.NET Complete Timeline — Framework → Modern .NET</title>
+<style>
+/* ============ RESET & BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0912;
+  --bg2:#0f0d1c;
+  --card:rgba(255,255,255,.042);
+  --card-hi:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.09);
+  --border-hi:rgba(255,255,255,.18);
+  --txt:#eae8f6;
+  --muted:#9b97b8;
+  --purple:#512BD4;
+  --purple-l:#a78bfa;
+  --purple-xl:#c4b5fd;
+  --sky:#38bdf8;
+  --amber:#fbbf24;
+  --green:#34d399;
+  --pink:#f472b6;
+  --radius:16px;
+  --mono:ui-monospace,'Cascadia Code','SF Mono',Menlo,Consolas,monospace;
+  --sans:'Segoe UI',system-ui,-apple-system,'Inter',Roboto,Helvetica,Arial,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--txt);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* ambient background */
+body::before{
+  content:'';position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(900px 600px at 12% -5%, rgba(81,43,212,.38), transparent 60%),
+    radial-gradient(800px 500px at 92% 8%, rgba(56,189,248,.14), transparent 55%),
+    radial-gradient(900px 700px at 50% 108%, rgba(167,139,250,.16), transparent 60%),
+    linear-gradient(180deg,#0a0912 0%,#0c0a17 50%,#0a0912 100%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 20%,transparent 85%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 20%,transparent 85%);
+}
+
+/* ============ SCROLL PROGRESS ============ */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0%;z-index:100;
+  background:linear-gradient(90deg,#512BD4,#a78bfa,#38bdf8);
+  box-shadow:0 0 14px rgba(167,139,250,.85);
+  transition:width .08s linear;
+}
+
+/* ============ NAV ============ */
+nav{
+  position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(10,9,18,.72);
+  border-bottom:1px solid var(--border);
+}
+.nav-in{
+  max-width:1180px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.4px;font-size:1.02rem}
+.brand .dot{
+  width:28px;height:28px;border-radius:9px;flex:0 0 auto;
+  background:linear-gradient(135deg,#512BD4,#a78bfa);
+  box-shadow:0 0 22px rgba(129,90,255,.55);
+  display:grid;place-items:center;font-size:.72rem;font-weight:900;color:#fff;
+}
+.nav-links{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:.83rem;font-weight:600;
+  padding:7px 12px;border-radius:9px;transition:.2s;white-space:nowrap;
+}
+.nav-links a:hover{color:#fff;background:var(--card-hi)}
+
+/* ============ LAYOUT ============ */
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+section{padding:78px 0;position:relative}
+.sec-head{margin-bottom:44px;max-width:780px}
+.kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.71rem;font-weight:800;letter-spacing:2.2px;text-transform:uppercase;
+  color:var(--purple-xl);margin-bottom:14px;
+  padding:6px 13px;border-radius:999px;
+  border:1px solid rgba(167,139,250,.32);
+  background:rgba(81,43,212,.16);
+}
+h2{font-size:clamp(1.75rem,3.6vw,2.6rem);font-weight:800;letter-spacing:-1.1px;line-height:1.15}
+h2 .grad{
+  background:linear-gradient(100deg,#a78bfa 0%,#38bdf8 55%,#f472b6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sec-head p{color:var(--muted);margin-top:14px;font-size:1.02rem;max-width:680px}
+
+/* ============ HERO ============ */
+header.hero{padding:86px 0 62px;text-align:center}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:8px 17px;border-radius:999px;font-size:.79rem;font-weight:700;
+  border:1px solid rgba(52,211,153,.35);
+  background:rgba(52,211,153,.11);color:#6ee7b7;margin-bottom:26px;
+}
+.pulse{
+  width:8px;height:8px;border-radius:50%;background:#34d399;
+  box-shadow:0 0 0 0 rgba(52,211,153,.7);
+  animation:pulse 2.2s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(52,211,153,.7)}
+  70%{box-shadow:0 0 0 11px rgba(52,211,153,0)}
+  100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}
+}
+h1{
+  font-size:clamp(2.3rem,6.6vw,4.3rem);font-weight:900;letter-spacing:-2.4px;line-height:1.04;
+}
+h1 .grad{
+  background:linear-gradient(105deg,#c4b5fd 0%,#a78bfa 30%,#38bdf8 68%,#f472b6 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-sub{
+  color:var(--muted);font-size:clamp(1rem,2vw,1.16rem);
+  max-width:660px;margin:22px auto 0;
+}
+.hero-sub strong{color:var(--purple-xl);font-weight:700}
+.hero-stats{
+  display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:44px;
+}
+.stat{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px 24px;min-width:150px;backdrop-filter:blur(8px);
+  transition:.25s;
+}
+.stat:hover{border-color:var(--border-hi);transform:translateY(-3px);background:var(--card-hi)}
+.stat .n{
+  font-size:1.6rem;font-weight:900;letter-spacing:-1px;font-family:var(--mono);
+  background:linear-gradient(120deg,#a78bfa,#38bdf8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.stat .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;font-weight:700;margin-top:3px}
+
+/* ============ CALLOUT ============ */
+.callout{
+  display:flex;gap:16px;align-items:flex-start;
+  background:linear-gradient(135deg,rgba(251,191,36,.11),rgba(251,191,36,.03));
+  border:1px solid rgba(251,191,36,.3);
+  border-left:3px solid var(--amber);
+  border-radius:14px;padding:20px 24px;margin-top:44px;text-align:left;
+  max-width:860px;margin-left:auto;margin-right:auto;
+}
+.callout .ico{font-size:1.4rem;line-height:1;flex:0 0 auto}
+.callout p{color:#e8e2cf;font-size:.95rem}
+.callout strong{color:#fcd34d}
+
+/* ============ FILTERS ============ */
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:38px}
+.fbtn{
+  font-family:var(--sans);font-size:.83rem;font-weight:700;cursor:pointer;
+  padding:9px 17px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);color:var(--muted);
+  transition:.2s;
+}
+.fbtn:hover{color:#fff;border-color:var(--border-hi);background:var(--card-hi)}
+.fbtn.active{
+  background:linear-gradient(135deg,#512BD4,#7c3aed);
+  border-color:transparent;color:#fff;
+  box-shadow:0 6px 22px -6px rgba(124,58,237,.9);
+}
+
+/* ============ TIMELINE ============ */
+.timeline{position:relative;padding-left:38px}
+.timeline::before{
+  content:'';position:absolute;left:11px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(180deg,
+    rgba(56,189,248,.75) 0%,
+    rgba(56,189,248,.6) 32%,
+    rgba(251,191,36,.7) 40%,
+    rgba(251,191,36,.6) 58%,
+    rgba(167,139,250,.85) 68%,
+    rgba(167,139,250,.5) 100%);
+  border-radius:2px;
+}
+.tl-item{
+  position:relative;margin-bottom:16px;
+  transition:opacity .35s,transform .35s;
+}
+.tl-item.hide{display:none}
+.tl-dot{
+  position:absolute;left:-33px;top:20px;
+  width:13px;height:13px;border-radius:50%;
+  background:#1a1728;border:2.5px solid var(--purple-l);
+  box-shadow:0 0 0 4px rgba(167,139,250,.09);
+  transition:.25s;z-index:2;
+}
+.tl-item[data-era="framework"] .tl-dot{border-color:var(--sky);box-shadow:0 0 0 4px rgba(56,189,248,.09)}
+.tl-item[data-era="core"] .tl-dot{border-color:var(--amber);box-shadow:0 0 0 4px rgba(251,191,36,.09)}
+.tl-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:17px 21px;
+  backdrop-filter:blur(8px);
+  transition:.28s cubic-bezier(.4,0,.2,1);
+}
+.tl-item:hover .tl-card{
+  background:var(--card-hi);border-color:var(--border-hi);
+  transform:translateX(6px);
+  box-shadow:0 14px 40px -18px rgba(0,0,0,.9);
+}
+.tl-item:hover .tl-dot{transform:scale(1.35)}
+.tl-item[data-era="framework"]:hover .tl-card{border-color:rgba(56,189,248,.42)}
+.tl-item[data-era="core"]:hover .tl-card{border-color:rgba(251,191,36,.42)}
+.tl-item[data-era="modern"]:hover .tl-card{border-color:rgba(167,139,250,.5)}
+
+.tl-head{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:7px}
+.yr{
+  font-family:var(--mono);font-size:.76rem;font-weight:800;letter-spacing:.5px;
+  padding:3px 9px;border-radius:7px;
+  background:rgba(255,255,255,.07);color:var(--muted);
+  border:1px solid var(--border);
+}
+.ver{font-weight:800;font-size:1.03rem;letter-spacing:-.35px}
+.tl-item[data-era="framework"] .ver{color:#7dd3fc}
+.tl-item[data-era="core"] .ver{color:#fcd34d}
+.tl-item[data-era="modern"] .ver{color:#c4b5fd}
+
+.pill{
+  font-size:.63rem;font-weight:900;letter-spacing:1.3px;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;border:1px solid transparent;
+}
+.pill.lts{background:rgba(52,211,153,.15);color:#6ee7b7;border-color:rgba(52,211,153,.34)}
+.pill.cur{background:rgba(251,191,36,.17);color:#fcd34d;border-color:rgba(251,191,36,.4)}
+.pill.fut{background:rgba(148,163,184,.14);color:#cbd5e1;border-color:rgba(148,163,184,.3)}
+.pill.leg{background:rgba(56,189,248,.13);color:#7dd3fc;border-color:rgba(56,189,248,.3)}
+
+.tl-desc{color:var(--muted);font-size:.905rem}
+.tl-item.is-star .tl-card{
+  border-color:rgba(251,191,36,.42);
+  background:linear-gradient(120deg,rgba(251,191,36,.09),rgba(81,43,212,.07));
+  box-shadow:0 0 42px -14px rgba(251,191,36,.5);
+}
+.tl-item.is-star .tl-dot{
+  border-color:var(--amber);background:var(--amber);
+  box-shadow:0 0 0 5px rgba(251,191,36,.16),0 0 18px rgba(251,191,36,.85);
+}
+
+/* ============ LINEAGE ============ */
+.lineage{display:flex;flex-direction:column;gap:20px}
+.lin-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.lin-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;
+  transition:.3s;
+}
+.lin-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.lin-card.fw::before{background:linear-gradient(90deg,#38bdf8,transparent)}
+.lin-card.core::before{background:linear-gradient(90deg,#fbbf24,transparent)}
+.lin-card.modern::before{background:linear-gradient(90deg,#a78bfa,#38bdf8,transparent)}
+.lin-card:hover{transform:translateY(-4px);border-color:var(--border-hi);background:var(--card-hi)}
+.lin-card h3{font-size:1.16rem;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
+.lin-card.fw h3{color:#7dd3fc}
+.lin-card.core h3{color:#fcd34d}
+.lin-card.modern h3{color:#c4b5fd}
+.lin-sub{
+  font-size:.71rem;text-transform:uppercase;letter-spacing:1.5px;
+  font-weight:800;color:var(--muted);margin-bottom:16px;display:block;
+}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chips span{
+  font-family:var(--mono);font-size:.71rem;font-weight:700;
+  padding:4px 9px;border-radius:7px;
+  background:rgba(255,255,255,.055);border:1px solid var(--border);color:#cfcbe4;
+  transition:.2s;
+}
+.lin-card:hover .chips span{background:rgba(255,255,255,.09)}
+.chips span.hi{
+  background:linear-gradient(135deg,rgba(81,43,212,.6),rgba(124,58,237,.4));
+  border-color:rgba(167,139,250,.5);color:#ede9fe;
+}
+.chips span.gold{
+  background:linear-gradient(135deg,rgba(251,191,36,.3),rgba(251,191,36,.12));
+  border-color:rgba(251,191,36,.55);color:#fde68a;
+}
+.lin-note{font-size:.87rem;color:var(--muted)}
+
+.lin-join{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  font-size:.83rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--purple-xl);padding:6px 0;
+}
+.lin-join::before,.lin-join::after{
+  content:'';height:1px;flex:1;max-width:220px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,.55),transparent);
+}
+
+/* ============ STACK GRID ============ */
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px;
+}
+.tech{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:18px;display:flex;gap:14px;align-items:flex-start;
+  transition:.26s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+}
+.tech::after{
+  content:'';position:absolute;inset:0;opacity:0;transition:.3s;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(167,139,250,.16),transparent 65%);
+  pointer-events:none;
+}
+.tech:hover::after{opacity:1}
+.tech:hover{
+  transform:translateY(-4px);border-color:rgba(167,139,250,.45);
+  box-shadow:0 16px 40px -20px rgba(81,43,212,.9);
+}
+.tech .ic{
+  font-size:1.32rem;line-height:1;width:42px;height:42px;flex:0 0 auto;
+  display:grid;place-items:center;border-radius:11px;
+  background:rgba(255,255,255,.055);border:1px solid var(--border);
+}
+.tech .tt{font-weight:800;font-size:.94rem;letter-spacing:-.2px;margin-bottom:3px}
+.tech .td{font-size:.82rem;color:var(--muted);line-height:1.5}
+
+/* ============ ROADMAP ============ */
+.roadmap{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:26px;backdrop-filter:blur(8px);
+}
+.step{
+  font-family:var(--mono);font-size:.82rem;font-weight:700;
+  padding:9px 15px;border-radius:10px;
+  background:rgba(255,255,255,.055);border:1px solid var(--border);color:#d6d2ea;
+  transition:.24s;cursor:default;
+}
+.step:hover{
+  background:linear-gradient(135deg,#512BD4,#7c3aed);
+  border-color:transparent;color:#fff;transform:translateY(-3px) scale(1.04);
+  box-shadow:0 10px 26px -10px rgba(124,58,237,.95);
+}
+.arrow{color:rgba(167,139,250,.5);font-weight:900;font-size:1rem}
+.roadmap-note{
+  margin-top:22px;font-size:.88rem;color:var(--muted);
+  border-left:3px solid rgba(167,139,250,.45);padding-left:16px;
+}
+.roadmap-note strong{color:var(--purple-xl)}
+
+/* ============ FOOTER ============ */
+footer{
+  border-top:1px solid var(--border);padding:42px 0 56px;text-align:center;
+  color:var(--muted);font-size:.85rem;
+}
+footer .fg{
+  font-weight:800;color:var(--purple-xl);letter-spacing:-.2px;
+  display:block;margin-bottom:8px;font-size:1rem;
+}
+
+/* ============ REVEAL ============ */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:760px){
+  section{padding:56px 0}
+  .wrap{padding:0 18px}
+  .nav-links{display:none}
+  .lin-row{grid-template-columns:1fr}
+  .timeline{padding-left:30px}
+  .tl-dot{left:-25px}
+  .timeline::before{left:8px}
+  .hero-stats{gap:10px}
+  .stat{padding:13px 18px;min-width:130px}
+  .roadmap{padding:18px}
+  .arrow{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand"><span class="dot">.NET</span> Complete Timeline</div>
+    <div class="nav-links">
+      <a href="#timeline">Timeline</a>
+      <a href="#lineage">Lineage</a>
+      <a href="#stack">Stack</a>
+      <a href="#career">Roadmap</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="pulse"></span> Current LTS: .NET 10 &nbsp;·&nbsp; .NET 12 not released yet</div>
+
+    <h1>From <span class="grad">.NET Framework</span><br>to <span class="grad">Modern .NET</span></h1>
+
+    <p class="hero-sub">
+      Two decades of Microsoft's runtime — the Windows-only legacy line, the cross-platform
+      .NET Core revolution, and today's unified modern .NET. As of <strong>October 2026</strong>,
+      <strong>.NET 10</strong> is the current LTS. <strong>.NET 11</strong> is the next annual release,
+      and <strong>.NET 12</strong> is expected in 2027.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat"><div class="n">2002</div><div class="l">First Release</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Eras</div></div>
+      <div class="stat"><div class="n">.NET 10</div><div class="l">Current LTS</div></div>
+      <div class="stat"><div class="n">2027</div><div class="l">.NET 12 Expected</div></div>
+    </div>
+
+    <div class="callout">
+      <span class="ico">⚠️</span>
+      <p><strong>.NET 12 is not the current released version.</strong> The latest released version is
+      <strong>.NET 10 (LTS)</strong>; .NET 11 is the next annual release, while .NET 12 is expected later.
+      Microsoft ships major .NET releases annually, with <strong>even-numbered versions as LTS</strong>.</p>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TIMELINE ================= -->
+<section id="timeline">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● Chronology</span>
+      <h2>The <span class="grad">Complete .NET Timeline</span></h2>
+      <p>Every major release from 2002 to the expected .NET 12 LTS in 2027 — what shipped, and what we build with it.</p>
+    </div>
+
+    <div class="filters reveal">
+      <button class="fbtn active" data-filter="all">All Releases</button>
+      <button class="fbtn" data-filter="framework">.NET Framework</button>
+      <button class="fbtn" data-filter="core">.NET Core</button>
+      <button class="fbtn" data-filter="modern">Modern .NET</button>
+    </div>
+
+    <div class="timeline" id="tl">
+
+      <!-- ---------- FRAMEWORK ---------- -->
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2002</span><span class="ver">.NET Framework 1.0</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Windows desktop, ASP.NET web, Windows Forms, Web Services.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2003</span><span class="ver">.NET Framework 1.1</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Windows apps, ASP.NET, Web Services.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2005</span><span class="ver">.NET Framework 2.0</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">WinForms, ASP.NET, ADO.NET, enterprise applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2006</span><span class="ver">.NET Framework 3.0</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">WPF, WCF, WF, Windows applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2007</span><span class="ver">.NET Framework 3.5</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">LINQ, ASP.NET, WPF, WCF, database applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2010</span><span class="ver">.NET Framework 4.0</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Parallel programming, WPF, ASP.NET, WCF, enterprise apps.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2012</span><span class="ver">.NET Framework 4.5</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Modernized ASP.NET, async/await, Web API, desktop.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2014</span><span class="ver">.NET Framework 4.5.1 / 4.5.2</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Enterprise Windows applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2015</span><span class="ver">.NET Framework 4.6</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">ASP.NET, WPF, WinForms, enterprise Windows.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2016</span><span class="ver">.NET Framework 4.6.1 / 4.6.2</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Windows desktop + enterprise applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2017</span><span class="ver">.NET Framework 4.7 / 4.7.1</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Windows desktop + ASP.NET.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2018</span><span class="ver">.NET Framework 4.7.2</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Windows / enterprise applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2019</span><span class="ver">.NET Framework 4.8</span><span class="pill leg">Legacy</span></div>
+          <p class="tl-desc">Mature Windows-only applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="framework">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2019</span><span class="ver">.NET Framework 4.8.1</span><span class="pill leg">Latest Framework</span></div>
+          <p class="tl-desc">Latest .NET Framework line; Windows applications.</p>
+        </div>
+      </div>
+
+      <!-- ---------- CORE ---------- -->
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2016</span><span class="ver">.NET Core 1.0</span><span class="pill fut">Cross-platform</span></div>
+          <p class="tl-desc">Cross-platform console, Web/API, cloud applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2016</span><span class="ver">.NET Core 1.1</span><span class="pill fut">Cross-platform</span></div>
+          <p class="tl-desc">Cross-platform web / backend.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2017</span><span class="ver">.NET Core 2.0</span><span class="pill fut">Cross-platform</span></div>
+          <p class="tl-desc">ASP.NET Core, Web API, cloud / backend.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2018</span><span class="ver">.NET Core 2.1</span><span class="pill lts">LTS</span></div>
+          <p class="tl-desc">Production web / API / cloud applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2018</span><span class="ver">.NET Core 2.2</span><span class="pill fut">Current</span></div>
+          <p class="tl-desc">Web / API / cloud.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2019</span><span class="ver">.NET Core 3.0</span><span class="pill fut">Desktop</span></div>
+          <p class="tl-desc">WPF + WinForms + ASP.NET Core + Web API.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="core">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2019</span><span class="ver">.NET Core 3.1</span><span class="pill lts">LTS</span></div>
+          <p class="tl-desc">Enterprise web / API + desktop.</p>
+        </div>
+      </div>
+
+      <!-- ---------- MODERN ---------- -->
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2020</span><span class="ver">.NET 5</span><span class="pill fut">Unified</span></div>
+          <p class="tl-desc">Unified modern .NET; Web, API, desktop, cloud.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2021</span><span class="ver">.NET 6</span><span class="pill lts">LTS</span></div>
+          <p class="tl-desc">Web API, MVC, Blazor, desktop, cloud, MAUI.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2022</span><span class="ver">.NET 7</span><span class="pill fut">STS</span></div>
+          <p class="tl-desc">Web / API, cloud, performance, modern applications.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2023</span><span class="ver">.NET 8</span><span class="pill lts">LTS</span></div>
+          <p class="tl-desc">Web API, Blazor, MVC, WPF, WinForms, MAUI, cloud, AI.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2024</span><span class="ver">.NET 9</span><span class="pill fut">STS</span></div>
+          <p class="tl-desc">Modern web / API, cloud, AI, performance, Blazor.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal is-star" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2025</span><span class="ver">.NET 10 ⭐</span><span class="pill cur">Current LTS</span></div>
+          <p class="tl-desc">Current LTS: Web / API, Blazor, cloud, desktop, AI, services.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2026</span><span class="ver">.NET 11</span><span class="pill fut">Expected</span></div>
+          <p class="tl-desc">Next-generation modern .NET — annual release.</p>
+        </div>
+      </div>
+
+      <div class="tl-item reveal" data-era="modern">
+        <span class="tl-dot"></span>
+        <div class="tl-card">
+          <div class="tl-head"><span class="yr">2027</span><span class="ver">.NET 12</span><span class="pill fut">Expected LTS</span></div>
+          <p class="tl-desc">Future LTS release — not yet available.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= LINEAGE ================= -->
+<section id="lineage">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● The Important Branch</span>
+      <h2>Three Eras, <span class="grad">One Family Tree</span></h2>
+      <p>.NET Framework and .NET Core evolved on separate tracks. In 2020, .NET Core became the unified
+        <strong>modern .NET</strong> — while .NET Framework remains the separate Windows-only legacy line.</p>
+    </div>
+
+    <div class="lineage">
+      <div class="lin-row">
+        <div class="lin-card fw reveal">
+          <h3>.NET Framework</h3>
+          <span class="lin-sub">Windows-focused · Legacy</span>
+          <div class="chips">
+            <span>1.0</span><span>1.1</span><span>2.0</span><span>3.0</span><span>3.5</span>
+            <span>4.0</span><span>4.5</span><span>4.6</span><span>4.7</span><span>4.8</span>
+            <span class="hi">4.8.1</span>
+          </div>
+          <p class="lin-note">Still used to maintain existing enterprise Windows applications. Not the target for new development.</p>
+        </div>
+
+        <div class="lin-card core reveal">
+          <h3>.NET Core</h3>
+          <span class="lin-sub">Cross-platform · Foundation</span>
+          <div class="chips">
+            <span>1.0</span><span>1.1</span><span>2.0</span>
+            <span class="gold">2.1 LTS</span><span>2.2</span><span>3.0</span>
+            <span class="gold">3.1 LTS</span>
+          </div>
+          <p class="lin-note">Introduced true cross-platform .NET. Evolved into the unified modern .NET starting with .NET 5.</p>
+        </div>
+      </div>
+
+      <div class="lin-join reveal">.NET Core becomes unified as</div>
+
+      <div class="lin-card modern reveal">
+        <h3>Modern .NET</h3>
+        <span class="lin-sub">Unified · Annual releases · Even numbers = LTS</span>
+        <div class="chips">
+          <span>5</span><span class="gold">6 LTS</span><span>7</span><span class="gold">8 LTS</span>
+          <span>9</span><span class="gold">10 LTS ⭐</span><span>11</span><span class="gold">12 LTS →</span>
+        </div>
+        <p class="lin-note">Microsoft confirms that .NET 5+ is the renamed, unified successor to .NET Core.
+          One SDK, one runtime, every platform — web, desktop, mobile, cloud, and AI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STACK ================= -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● What Sits On Top</span>
+      <h2>The <span class="grad">Modern .NET Stack</span></h2>
+      <p>Everything you build with once the runtime is in place.</p>
+    </div>
+
+    <div class="grid">
+      <div class="tech reveal"><div class="ic">🌐</div><div><div class="tt">ASP.NET Core</div><div class="td">Web applications &amp; backend</div></div></div>
+      <div class="tech reveal"><div class="ic">🔌</div><div><div class="tt">Web API</div><div class="td">REST APIs / backend services</div></div></div>
+      <div class="tech reveal"><div class="ic">🧩</div><div><div class="tt">MVC</div><div class="td">Server-rendered web applications</div></div></div>
+      <div class="tech reveal"><div class="ic">⚡</div><div><div class="tt">Blazor</div><div class="td">Web UI using C#</div></div></div>
+      <div class="tech reveal"><div class="ic">🪶</div><div><div class="tt">Minimal APIs</div><div class="td">Lightweight APIs</div></div></div>
+      <div class="tech reveal"><div class="ic">📡</div><div><div class="tt">SignalR</div><div class="td">Real-time communication</div></div></div>
+      <div class="tech reveal"><div class="ic">🗄️</div><div><div class="tt">Entity Framework Core</div><div class="td">Database / ORM</div></div></div>
+      <div class="tech reveal"><div class="ic">🪟</div><div><div class="tt">WPF</div><div class="td">Windows desktop UI</div></div></div>
+      <div class="tech reveal"><div class="ic">🧱</div><div><div class="tt">WinForms</div><div class="td">Windows desktop applications</div></div></div>
+      <div class="tech reveal"><div class="ic">📱</div><div><div class="tt">.NET MAUI</div><div class="td">Cross-platform desktop / mobile</div></div></div>
+      <div class="tech reveal"><div class="ic">⚙️</div><div><div class="tt">Worker Services</div><div class="td">Background services</div></div></div>
+      <div class="tech reveal"><div class="ic">🚀</div><div><div class="tt">gRPC</div><div class="td">High-performance service-to-service</div></div></div>
+      <div class="tech reveal"><div class="ic">🧠</div><div><div class="tt">ML.NET</div><div class="td">Machine learning with .NET</div></div></div>
+      <div class="tech reveal"><div class="ic">☁️</div><div><div class="tt">Azure / AWS + .NET</div><div class="td">Cloud applications</div></div></div>
+      <div class="tech reveal"><div class="ic">🐳</div><div><div class="tt">Docker + .NET</div><div class="td">Containers / microservices</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CAREER ================= -->
+<section id="career">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">● Career Roadmap</span>
+      <h2>Your <span class="grad">Learning Path</span></h2>
+      <p>Focus primarily on the modern stack. Framework-era tech is for maintenance, not new builds.</p>
+    </div>
+
+    <div class="roadmap reveal">
+      <span class="step">C#</span><span class="arrow">→</span>
+      <span class="step">.NET 8 / 10</span><span class="arrow">→</span>
+      <span class="step">ASP.NET Core</span><span class="arrow">→</span>
+      <span class="step">Web API</span><span class="arrow">→</span>
+      <span class="step">EF Core</span><span class="arrow">→</span>
+      <span class="step">SQL</span><span class="arrow">→</span>
+      <span class="step">JWT / Auth</span><span class="arrow">→</span>
+      <span class="step">Testing</span><span class="arrow">→</span>
+      <span class="step">Docker</span><span class="arrow">→</span>
+      <span class="step">Azure / AWS</span><span class="arrow">→</span>
+      <span class="step">System Design</span>
+    </div>
+
+    <p class="roadmap-note reveal">
+      <strong>.NET Framework / WPF / WinForms</strong> are still useful for maintaining existing enterprise
+      applications, but <strong>Microsoft recommends modern .NET for all new development</strong>.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="fg">.NET Complete Timeline — Framework → Modern .NET</span>
+    Accurate as of October 2026 · .NET 10 is the current LTS · .NET 11 next annual · .NET 12 LTS expected 2027
+  </div>
+</footer>
+
+<script>
+/* ---------- Scroll progress ---------- */
+const bar = document.getElementById('progress');
+function onScroll(){
+  const h = document.documentElement;
+  const max = h.scrollHeight - h.clientHeight;
+  bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+/* ---------- Reveal on scroll ---------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach((e, i)=>{
+    if(e.isIntersecting){
+      const delay = Math.min(i * 60, 240);
+      setTimeout(()=> e.target.classList.add('in'), delay);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- Timeline filter ---------- */
+const buttons = document.querySelectorAll('.fbtn');
+const items   = document.querySelectorAll('#tl .tl-item');
+
+buttons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    buttons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+
+    items.forEach(it=>{
+      const show = (f === 'all' || it.dataset.era === f);
+      it.classList.toggle('hide', !show);
+      if(show){
+        it.classList.remove('in');
+        requestAnimationFrame(()=> requestAnimationFrame(()=> it.classList.add('in')));
+      }
+    });
+  });
+});
+
+/* ---------- Tech card cursor glow ---------- */
+document.querySelectorAll('.tech').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+});
+</script>
+</body>
+</html>
